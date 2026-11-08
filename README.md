@@ -15,6 +15,8 @@ confidence, an explicit verification status, a fix, a safe security test and a r
 > taint tracking). It is **not** a full SAST engine. It produces *candidates* that the agent triages
 > by reading the code. It can integrate Semgrep, Gitleaks and Trivy when they are installed.
 
+**Quick install:** `npx skills add titoparra4/secure-code-reviewer` ([skills.sh](https://www.skills.sh/)) — or see [Installation](#installation) for `git clone` and other environments.
+
 ---
 
 ## Table of contents
@@ -167,10 +169,33 @@ workspace offers skills. If it does not:
 3. Without code execution, the assistant follows the "Reviewing without tooling" procedure in
    `references/security-methodology.md`.
 
-### Third-party skill installers
+### skills.sh (`skills` CLI)
 
-Community CLIs such as `npx skills add titoparra4/secure-code-reviewer` can install skills from GitHub.
-They are not maintained by this project; review what they install.
+The skill is installable with the open [`skills` CLI](https://github.com/vercel-labs/skills) and listed on
+[skills.sh](https://www.skills.sh/). Requires Node.js 22.20 or later.
+
+```bash
+# preview what the repository contains (installs nothing)
+npx skills add titoparra4/secure-code-reviewer --list
+
+# install the v1.0.0 release globally for Claude Code
+npx skills add titoparra4/secure-code-reviewer@v1.0.0 -g -a claude-code
+
+# other agents, e.g. Codex, or several at once
+npx skills add titoparra4/secure-code-reviewer@v1.0.0 -g -a claude-code codex
+
+# list, update, remove
+npx skills list -g
+npx skills update
+npx skills remove secure-code-reviewer -g
+```
+
+Omit `-g` to install into the current project (`.claude/skills/` for Claude Code). Without `-y` the CLI
+asks a few interactive questions (for example symlink vs copy).
+
+The CLI is maintained by a third party, not by this project; review what it installs. It sends anonymous
+install telemetry, which is what lists the skill on skills.sh; set `DISABLE_TELEMETRY=1` or
+`DO_NOT_TRACK=1` to opt out.
 
 ### Verify the installation
 
