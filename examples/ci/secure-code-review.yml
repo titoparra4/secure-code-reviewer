@@ -23,19 +23,19 @@ jobs:
       contents: read
       security-events: write   # only needed for the SARIF upload step
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           repository: titoparra4/secure-code-reviewer
           ref: ${{ env.SCR_REF }}
           path: .scr-tool
           persist-credentials: false
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
