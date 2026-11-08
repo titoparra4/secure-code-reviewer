@@ -1,0 +1,4 @@
+flask==2.0.1
+requests
+PyYAML>=5.1
+pyjwt==1.7.1

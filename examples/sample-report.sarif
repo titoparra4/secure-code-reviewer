@@ -1,0 +1,2246 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Secure Code Reviewer",
+          "semanticVersion": "1.0.0",
+          "informationUri": "https://github.com/titoparra4/secure-code-reviewer",
+          "rules": [
+            {
+              "id": "secrets.connection-string-password",
+              "name": "CredentialsInDatabaseBrokerConnectionString",
+              "shortDescription": {
+                "text": "Credentials in database/broker connection string"
+              },
+              "fullDescription": {
+                "text": "A value matching the 'connection-string-password' pattern was found. The value is redacted. If it is real: revoke/rotate it and review provider logs for misuse."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/798.html",
+              "help": {
+                "text": "Remove the value from source, load it from a secret manager or environment, and if it is (or may be) real: revoke/rotate it, review usage logs for abuse and purge it from git history."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-798",
+                  "Secrets Exposure"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "injection.sql.string-built-query",
+              "name": "SqlQueryBuiltWithStringInterpolation",
+              "shortDescription": {
+                "text": "SQL query built with string interpolation"
+              },
+              "fullDescription": {
+                "text": "A SQL statement is built by string formatting/concatenation instead of bound parameters."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/89.html",
+              "help": {
+                "text": "Use parameterized queries / prepared statements or the ORM query builder. Never interpolate values into SQL; allow-list identifiers (column/table names) if they must be dynamic."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-89",
+                  "SQL Injection"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "agent.insecure-direct-object-reference-on-invoice-retrieval",
+              "name": "InsecureDirectObjectReferenceOnInvoiceRetrieval",
+              "shortDescription": {
+                "text": "Insecure Direct Object Reference on invoice retrieval"
+              },
+              "fullDescription": {
+                "text": "The handler loads an invoice by the path parameter invoice_id and returns it without checking that the invoice belongs to the authenticated user. No authorization decorator or ownership filter exists on this route or in a before_request hook (reviewed app/app.py in full)."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/639.html",
+              "help": {
+                "text": "Scope the query to the current user (WHERE id = ? AND owner_id = ?) and return 404 when the invoice is not owned by the caller. Centralize the check in a reusable authorization helper."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-639",
+                  "Broken Access Control"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "injection.command.python",
+              "name": "OsCommandExecutionThroughAShell",
+              "shortDescription": {
+                "text": "OS command execution through a shell"
+              },
+              "fullDescription": {
+                "text": "An OS command is executed through a shell or with a dynamically built command string."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/78.html",
+              "help": {
+                "text": "Avoid the shell: pass an argument list (shell=False / execFile / ProcessBuilder with separate args), validate input against an allow-list and prefer native libraries over shelling out."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-78",
+                  "Command Injection"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "deserialization.python",
+              "name": "UnsafeDeserializationPickleMarshalYamlLoad",
+              "shortDescription": {
+                "text": "Unsafe deserialization (pickle/marshal/yaml.load)"
+              },
+              "fullDescription": {
+                "text": "Data is deserialized with a format/loader that can instantiate arbitrary objects."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/502.html",
+              "help": {
+                "text": "Use data-only formats (JSON) or safe loaders (yaml.safe_load). If native serialization is unavoidable, sign/authenticate the payload and restrict allowed types."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-502",
+                  "Insecure Deserialization"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "auth.jwt.signature-not-verified",
+              "name": "JwtDecodedWithoutSignatureVerification",
+              "shortDescription": {
+                "text": "JWT decoded without signature verification"
+              },
+              "fullDescription": {
+                "text": "JWT validation is weakened (signature, algorithm or claim checks disabled)."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/347.html",
+              "help": {
+                "text": "Always verify the signature with an explicit algorithm allow-list, and validate exp, nbf, iss and aud."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-347",
+                  "Broken Authentication (JWT)"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "crypto.weak-hash",
+              "name": "WeakPasswordHashingFastUnsaltedHash",
+              "shortDescription": {
+                "text": "Weak password hashing (fast, unsalted hash)"
+              },
+              "fullDescription": {
+                "text": "A weak hash algorithm (MD5/SHA-1) is used."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/916.html",
+              "help": {
+                "text": "For passwords use Argon2id, scrypt or bcrypt with per-user salt; for integrity use SHA-256+ or HMAC."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-916",
+                  "Insecure Cryptography"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "injection.command.node",
+              "name": "ChildProcessExecWithADynamicCommand",
+              "shortDescription": {
+                "text": "child_process exec with a dynamic command"
+              },
+              "fullDescription": {
+                "text": "An OS command is executed through a shell or with a dynamically built command string."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/78.html",
+              "help": {
+                "text": "Avoid the shell: pass an argument list (shell=False / execFile / ProcessBuilder with separate args), validate input against an allow-list and prefer native libraries over shelling out."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-78",
+                  "Command Injection"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "container.dangerous-capabilities",
+              "name": "DangerousLinuxCapabilitiesAdded",
+              "shortDescription": {
+                "text": "Dangerous Linux capabilities added"
+              },
+              "fullDescription": {
+                "text": "The container/workload runs with elevated privileges or host access."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/250.html",
+              "help": {
+                "text": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-250",
+                  "Container Security"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "iac.storage.public-acl",
+              "name": "StorageMadePubliclyAccessible",
+              "shortDescription": {
+                "text": "Storage made publicly accessible"
+              },
+              "fullDescription": {
+                "text": "Storage or data service is publicly accessible or unencrypted."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/732.html",
+              "help": {
+                "text": "Block public access, enable encryption at rest and in transit, and use least-privilege access policies."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-732",
+                  "Infrastructure Exposure"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "container.privileged",
+              "name": "PrivilegedContainer",
+              "shortDescription": {
+                "text": "Privileged container"
+              },
+              "fullDescription": {
+                "text": "The container/workload runs with elevated privileges or host access."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/250.html",
+              "help": {
+                "text": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-250",
+                  "Container Security"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "container.docker-socket-mount",
+              "name": "DockerSocketMountedIntoAContainer",
+              "shortDescription": {
+                "text": "Docker socket mounted into a container"
+              },
+              "fullDescription": {
+                "text": "The container/workload runs with elevated privileges or host access."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/250.html",
+              "help": {
+                "text": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-250",
+                  "Container Security"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "cicd.gha.script-injection",
+              "name": "UntrustedGithubEventDataInterpolatedIntoAScript",
+              "shortDescription": {
+                "text": "Untrusted GitHub event data interpolated into a script"
+              },
+              "fullDescription": {
+                "text": "CI/CD workflow configuration allows untrusted input or excessive privileges."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/94.html",
+              "help": {
+                "text": "Use least-privilege `permissions:`, never interpolate untrusted event fields into `run:` (use env vars), avoid checking out PR code in pull_request_target, and pin actions to full commit SHAs."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-94",
+                  "CI/CD Security"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "secrets.generic-secret-assignment",
+              "name": "HardcodedSecretOrPassword",
+              "shortDescription": {
+                "text": "Hardcoded secret or password"
+              },
+              "fullDescription": {
+                "text": "A value matching the 'generic-secret-assignment' pattern was found. The value is redacted. If it is real: revoke/rotate it and review provider logs for misuse."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/798.html",
+              "help": {
+                "text": "Remove the value from source, load it from a secret manager or environment, and if it is (or may be) real: revoke/rotate it, review usage logs for abuse and purge it from git history."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-798",
+                  "Secrets Exposure"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "path-traversal.user-path",
+              "name": "FilePathBuiltFromRequestInput",
+              "shortDescription": {
+                "text": "File path built from request input"
+              },
+              "fullDescription": {
+                "text": "A filesystem path is built from request input."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/22.html",
+              "help": {
+                "text": "Resolve the final path and verify it stays inside the base directory; prefer opaque identifiers mapped server-side; use safe helpers (send_from_directory, secure_filename)."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-22",
+                  "Path Traversal"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "ssrf.user-controlled-url",
+              "name": "OutboundRequestToAUserControlledUrl",
+              "shortDescription": {
+                "text": "Outbound request to a user-controlled URL"
+              },
+              "fullDescription": {
+                "text": "An outbound HTTP request uses a URL derived from user input."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/918.html",
+              "help": {
+                "text": "Allow-list destination hosts/schemes, resolve and block private/link-local ranges, disable redirects or re-validate them, and enforce egress controls."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-918",
+                  "Server-Side Request Forgery"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "xss.server-reflected",
+              "name": "RequestInputReflectedInAnHtmlResponse",
+              "shortDescription": {
+                "text": "Request input reflected in an HTML response"
+              },
+              "fullDescription": {
+                "text": "Data is written into HTML without context-aware escaping, or escaping is explicitly disabled."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/79.html",
+              "help": {
+                "text": "Rely on framework auto-escaping, use textContent instead of innerHTML, sanitize rich HTML with a vetted sanitizer (e.g. DOMPurify) and deploy a strict Content-Security-Policy."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-79",
+                  "Cross-Site Scripting (XSS)"
+                ],
+                "security-severity": "8.0"
+              }
+            },
+            {
+              "id": "supply-chain.remote-script-pipe",
+              "name": "RemoteScriptPipedToAShell",
+              "shortDescription": {
+                "text": "Remote script piped to a shell"
+              },
+              "fullDescription": {
+                "text": "A remote script is downloaded and executed without integrity verification."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/494.html",
+              "help": {
+                "text": "Download to a file, verify a pinned checksum or signature, then execute; prefer package managers."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-494",
+                  "Supply Chain"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "container.host-namespaces",
+              "name": "HostNetworkPidIpcNamespaceShared",
+              "shortDescription": {
+                "text": "Host network/PID/IPC namespace shared"
+              },
+              "fullDescription": {
+                "text": "The container/workload runs with elevated privileges or host access."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/250.html",
+              "help": {
+                "text": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-250",
+                  "Container Security"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "container.runs-as-root-k8s",
+              "name": "WorkloadConfiguredToRunAsRoot",
+              "shortDescription": {
+                "text": "Workload configured to run as root"
+              },
+              "fullDescription": {
+                "text": "The container/workload runs with elevated privileges or host access."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/250.html",
+              "help": {
+                "text": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-250",
+                  "Container Security"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "container.privilege-escalation",
+              "name": "AllowprivilegeescalationEnabled",
+              "shortDescription": {
+                "text": "allowPrivilegeEscalation enabled"
+              },
+              "fullDescription": {
+                "text": "The container/workload runs with elevated privileges or host access."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/250.html",
+              "help": {
+                "text": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-250",
+                  "Container Security"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "iac.encryption-disabled",
+              "name": "EncryptionAtRestInTransitDisabled",
+              "shortDescription": {
+                "text": "Encryption at rest/in transit disabled"
+              },
+              "fullDescription": {
+                "text": "Storage or data service is publicly accessible or unencrypted."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/311.html",
+              "help": {
+                "text": "Block public access, enable encryption at rest and in transit, and use least-privilege access policies."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-311",
+                  "Infrastructure Exposure"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "webserver.legacy-tls",
+              "name": "LegacyTlsSslProtocolEnabled",
+              "shortDescription": {
+                "text": "Legacy TLS/SSL protocol enabled"
+              },
+              "fullDescription": {
+                "text": "Legacy TLS/SSL protocol versions or weak ciphers are enabled."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/326.html",
+              "help": {
+                "text": "Allow only TLS 1.2 and 1.3 with modern cipher suites."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-326",
+                  "Insecure Transport"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "dependencies.wildcard-version",
+              "name": "WildcardLatestDependencyVersionCors",
+              "shortDescription": {
+                "text": "Wildcard/latest dependency version: cors"
+              },
+              "fullDescription": {
+                "text": "Any future release (including a compromised one) will be installed automatically."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/1357.html",
+              "help": {
+                "text": "Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-1357",
+                  "Dependency Security"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "dependencies.untrusted-source",
+              "name": "DependencyInstalledFromVcsUrlInternalUtils",
+              "shortDescription": {
+                "text": "Dependency installed from VCS/URL: internal-utils"
+              },
+              "fullDescription": {
+                "text": "Dependency resolved from a git/URL/path source bypasses registry integrity controls and may change without a version bump."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/829.html",
+              "help": {
+                "text": "Prefer a released registry version pinned with a lockfile/hash; if a VCS source is required, pin to a full commit SHA."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-829",
+                  "Dependency Security"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "crypto.insecure-random",
+              "name": "NonCryptographicPrngForASecurityValue",
+              "shortDescription": {
+                "text": "Non-cryptographic PRNG for a security value"
+              },
+              "fullDescription": {
+                "text": "A non-cryptographic PRNG appears to generate a security-sensitive value."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/338.html",
+              "help": {
+                "text": "Use a CSPRNG: secrets.token_urlsafe (Python), crypto.randomBytes / crypto.randomUUID (Node), SecureRandom (Java), RandomNumberGenerator (.NET)."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-338",
+                  "Insecure Randomness"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "config.debug-enabled",
+              "name": "DebugModeEnabled",
+              "shortDescription": {
+                "text": "Debug mode enabled"
+              },
+              "fullDescription": {
+                "text": "Debug mode or developer error pages are enabled."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/489.html",
+              "help": {
+                "text": "Drive debug flags from environment configuration and default to off in production."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-489",
+                  "Security Misconfiguration"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "config.cors-wildcard",
+              "name": "CorsAllowsAnyOrigin",
+              "shortDescription": {
+                "text": "CORS allows any origin"
+              },
+              "fullDescription": {
+                "text": "CORS allows any origin."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/942.html",
+              "help": {
+                "text": "Allow-list trusted origins; never combine wildcard/reflected origins with credentials."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-942",
+                  "Security Misconfiguration"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "mass-assignment.request-body-binding",
+              "name": "ModelBoundDirectlyToRequestBody",
+              "shortDescription": {
+                "text": "Model bound directly to request body"
+              },
+              "fullDescription": {
+                "text": "A model/object is created or updated directly from the request body."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/915.html",
+              "help": {
+                "text": "Map input through an explicit allow-list or DTO/schema; never bind the raw body to persistence models."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-915",
+                  "Mass Assignment"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "auth.jwt.decode-without-verify-node",
+              "name": "JsonwebtokenDecodeDoesNotVerifySignatures",
+              "shortDescription": {
+                "text": "jsonwebtoken decode() does not verify signatures"
+              },
+              "fullDescription": {
+                "text": "JWT validation is weakened (signature, algorithm or claim checks disabled)."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/347.html",
+              "help": {
+                "text": "Always verify the signature with an explicit algorithm allow-list, and validate exp, nbf, iss and aud."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-347",
+                  "Broken Authentication (JWT)"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "errors.stack-trace-in-response",
+              "name": "ExceptionDetailsReturnedToTheClient",
+              "shortDescription": {
+                "text": "Exception details returned to the client"
+              },
+              "fullDescription": {
+                "text": "Exception details or stack traces are returned to the client."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/209.html",
+              "help": {
+                "text": "Return generic error messages with a correlation id and log details server-side."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-209",
+                  "Insecure Error Handling"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "iac.network.open-to-world",
+              "name": "IngressOpenTo00000",
+              "shortDescription": {
+                "text": "Ingress open to 0.0.0.0/0"
+              },
+              "fullDescription": {
+                "text": "A resource is exposed to the internet or allows unrestricted network access."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/284.html",
+              "help": {
+                "text": "Restrict CIDR ranges to known networks, place services behind load balancers/WAF and use private subnets."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-284",
+                  "Infrastructure Exposure"
+                ],
+                "security-severity": "5.5"
+              }
+            },
+            {
+              "id": "container.docker.unpinned-base-image",
+              "name": "BaseImageNotPinnedLatestOrNoTag",
+              "shortDescription": {
+                "text": "Base image not pinned (latest or no tag)"
+              },
+              "fullDescription": {
+                "text": "The base image is not pinned to a specific version/digest."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/1357.html",
+              "help": {
+                "text": "Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-1357",
+                  "Supply Chain"
+                ],
+                "security-severity": "3.0"
+              }
+            },
+            {
+              "id": "webserver.directory-listing",
+              "name": "DirectoryListingEnabled",
+              "shortDescription": {
+                "text": "Directory listing enabled"
+              },
+              "fullDescription": {
+                "text": "Web server configuration discloses information (directory listing, version banners)."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/548.html",
+              "help": {
+                "text": "Disable directory listing and version banners."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-548",
+                  "Sensitive Information Disclosure"
+                ],
+                "security-severity": "3.0"
+              }
+            },
+            {
+              "id": "dependencies.not-pinned",
+              "name": "1DependenciesWithoutAnExactPinnedVersion",
+              "shortDescription": {
+                "text": "1 dependencies without an exact pinned version"
+              },
+              "fullDescription": {
+                "text": "Version ranges without a lockfile make builds non-reproducible and prevent accurate vulnerability verification."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/1357.html",
+              "help": {
+                "text": "Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-1357",
+                  "Dependency Security"
+                ],
+                "security-severity": "3.0"
+              }
+            },
+            {
+              "id": "cicd.gha.missing-permissions",
+              "name": "WorkflowWithoutExplicitPermissionsBlock",
+              "shortDescription": {
+                "text": "Workflow without explicit permissions block"
+              },
+              "fullDescription": {
+                "text": "CI/CD workflow configuration allows untrusted input or excessive privileges."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/250.html",
+              "help": {
+                "text": "Use least-privilege `permissions:`, never interpolate untrusted event fields into `run:` (use env vars), avoid checking out PR code in pull_request_target, and pin actions to full commit SHAs."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-250",
+                  "CI/CD Security"
+                ],
+                "security-severity": "3.0"
+              }
+            },
+            {
+              "id": "container.docker.no-user",
+              "name": "DockerfileHasNoUserInstructionDefaultsToRoot",
+              "shortDescription": {
+                "text": "Dockerfile has no USER instruction (defaults to root)"
+              },
+              "fullDescription": {
+                "text": "The container/workload runs with elevated privileges or host access."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/250.html",
+              "help": {
+                "text": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-250",
+                  "Container Security"
+                ],
+                "security-severity": "3.0"
+              }
+            },
+            {
+              "id": "cicd.gha.unpinned-action",
+              "name": "ThirdPartyActionNotPinnedToACommitSha",
+              "shortDescription": {
+                "text": "Third-party action not pinned to a commit SHA"
+              },
+              "fullDescription": {
+                "text": "CI/CD workflow configuration allows untrusted input or excessive privileges."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/829.html",
+              "help": {
+                "text": "Use least-privilege `permissions:`, never interpolate untrusted event fields into `run:` (use env vars), avoid checking out PR code in pull_request_target, and pin actions to full commit SHAs."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-829",
+                  "Supply Chain"
+                ],
+                "security-severity": "0.0"
+              }
+            },
+            {
+              "id": "webserver.version-disclosure",
+              "name": "ServerVersionBannerEnabled",
+              "shortDescription": {
+                "text": "Server version banner enabled"
+              },
+              "fullDescription": {
+                "text": "Web server configuration discloses information (directory listing, version banners)."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/200.html",
+              "help": {
+                "text": "Disable directory listing and version banners."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-200",
+                  "Sensitive Information Disclosure"
+                ],
+                "security-severity": "0.0"
+              }
+            },
+            {
+              "id": "dependencies.missing-lockfile",
+              "name": "NpmProjectWithoutALockfile",
+              "shortDescription": {
+                "text": "npm project without a lockfile"
+              },
+              "fullDescription": {
+                "text": "Without a lockfile, installed versions vary between builds."
+              },
+              "helpUri": "https://cwe.mitre.org/data/definitions/1357.html",
+              "help": {
+                "text": "Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs."
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "CWE-1357",
+                  "Dependency Security"
+                ],
+                "security-severity": "0.0"
+              }
+            }
+          ]
+        }
+      },
+      "automationDetails": {
+        "id": "secure-code-reviewer/full/"
+      },
+      "results": [
+        {
+          "ruleId": "secrets.connection-string-password",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0001] Credentials in database/broker connection string (High, confidence High, Probable). Remove the value from source, load it from a secret manager or environment, and if it is (or may be) real: revoke/rotate it, review usage logs for abuse and purge it from git history."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 17,
+                  "endLine": 17
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "51c3d2e32ebc6797193296d7206cff85"
+          },
+          "properties": {
+            "scrId": "SCR-0001",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A07:2021-Identification and Authentication Failures"
+          }
+        },
+        {
+          "ruleId": "injection.sql.string-built-query",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0002] SQL query built with string interpolation (High, confidence High, Probable). Use parameterized queries / prepared statements or the ORM query builder. Never interpolate values into SQL; allow-list identifiers (column/table names) if they must be dynamic."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 29,
+                  "endLine": 29
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "1573357b88c79be42f57994c3d2285b0"
+          },
+          "properties": {
+            "scrId": "SCR-0002",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A03:2021-Injection"
+          }
+        },
+        {
+          "ruleId": "agent.insecure-direct-object-reference-on-invoice-retrieval",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0003] Insecure Direct Object Reference on invoice retrieval (High, confidence High, Confirmed). Scope the query to the current user (WHERE id = ? AND owner_id = ?) and return 404 when the invoice is not owned by the caller. Centralize the check in a reusable authorization helper."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 41,
+                  "endLine": 46
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "a8be2d9e151c09614586bcf962ab5479"
+          },
+          "properties": {
+            "scrId": "SCR-0003",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Confirmed",
+            "priority": "P1",
+            "owasp": "A01:2021-Broken Access Control"
+          }
+        },
+        {
+          "ruleId": "injection.command.python",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0004] OS command execution through a shell (High, confidence High, Probable). Avoid the shell: pass an argument list (shell=False / execFile / ProcessBuilder with separate args), validate input against an allow-list and prefer native libraries over shelling out."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 52,
+                  "endLine": 52
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "574d11c0eeae32352766017c0a474fbd"
+          },
+          "properties": {
+            "scrId": "SCR-0004",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A03:2021-Injection"
+          }
+        },
+        {
+          "ruleId": "deserialization.python",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0005] Unsafe deserialization (pickle/marshal/yaml.load) (High, confidence High, Probable). Use data-only formats (JSON) or safe loaders (yaml.safe_load). If native serialization is unavoidable, sign/authenticate the payload and restrict allowed types."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 70,
+                  "endLine": 70
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "2e3e0d593f1ecacbe78348802a67b342"
+          },
+          "properties": {
+            "scrId": "SCR-0005",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A08:2021-Software and Data Integrity Failures"
+          }
+        },
+        {
+          "ruleId": "auth.jwt.signature-not-verified",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0006] JWT decoded without signature verification (High, confidence High, Probable). Always verify the signature with an explicit algorithm allow-list, and validate exp, nbf, iss and aud."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 77,
+                  "endLine": 77
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "685136961c437033fddd16f69a3da5a1"
+          },
+          "properties": {
+            "scrId": "SCR-0006",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A07:2021-Identification and Authentication Failures"
+          }
+        },
+        {
+          "ruleId": "crypto.weak-hash",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0007] Weak password hashing (fast, unsalted hash) (High, confidence High, Probable). For passwords use Argon2id, scrypt or bcrypt with per-user salt; for integrity use SHA-256+ or HMAC."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 82,
+                  "endLine": 82
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "9ff2c0dc892f4d23f425e33ae46bb9c4"
+          },
+          "properties": {
+            "scrId": "SCR-0007",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A02:2021-Cryptographic Failures"
+          }
+        },
+        {
+          "ruleId": "injection.command.node",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0008] child_process exec with a dynamic command (High, confidence High, Probable). Avoid the shell: pass an argument list (shell=False / execFile / ProcessBuilder with separate args), validate input against an allow-list and prefer native libraries over shelling out."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/server.js",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 17,
+                  "endLine": 17
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "f9d81014334bd2e8181f0ac06cb75efb"
+          },
+          "properties": {
+            "scrId": "SCR-0008",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A03:2021-Injection"
+          }
+        },
+        {
+          "ruleId": "container.dangerous-capabilities",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0009] Dangerous Linux capabilities added (High, confidence High, Probable). Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/deployment.yaml",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 24,
+                  "endLine": 24
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "82c7128452f22dc4cbb9b05b60082640"
+          },
+          "properties": {
+            "scrId": "SCR-0009",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "iac.storage.public-acl",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0010] Storage made publicly accessible (High, confidence High, Probable). Block public access, enable encryption at rest and in transit, and use least-privilege access policies."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/main.tf",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 21,
+                  "endLine": 21
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "24e9a7b6f9803853a6681db36ad3d1d8"
+          },
+          "properties": {
+            "scrId": "SCR-0010",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "iac.storage.public-acl",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0011] Storage made publicly accessible (High, confidence High, Probable). Block public access, enable encryption at rest and in transit, and use least-privilege access policies."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/main.tf",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 28,
+                  "endLine": 28
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "252769500358a6e334eb2fc29a7f1a9e"
+          },
+          "properties": {
+            "scrId": "SCR-0011",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "container.privileged",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0012] Privileged container (High, confidence High, Probable). Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/docker-compose.yml",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 4,
+                  "endLine": 4
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "c04158fe1b504d68827798cc32777cf7"
+          },
+          "properties": {
+            "scrId": "SCR-0012",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "container.docker-socket-mount",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0013] Docker socket mounted into a container (High, confidence High, Probable). Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/docker-compose.yml",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 8,
+                  "endLine": 8
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "b52bc1dbeb78f375010139fb2c152faf"
+          },
+          "properties": {
+            "scrId": "SCR-0013",
+            "severity": "High",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P1",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "cicd.gha.script-injection",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0014] Untrusted GitHub event data interpolated into a script (High, confidence Medium, Probable). Use least-privilege `permissions:`, never interpolate untrusted event fields into `run:` (use env vars), avoid checking out PR code in pull_request_target, and pin actions to full commit SHAs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/.github/workflows/triage.yml",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 12,
+                  "endLine": 12
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "a0511d6305ec393619ed3e79a280ee55"
+          },
+          "properties": {
+            "scrId": "SCR-0014",
+            "severity": "High",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A03:2021-Injection"
+          }
+        },
+        {
+          "ruleId": "secrets.generic-secret-assignment",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0015] Hardcoded secret or password (High, confidence Medium, Probable). Remove the value from source, load it from a secret manager or environment, and if it is (or may be) real: revoke/rotate it, review usage logs for abuse and purge it from git history."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 16,
+                  "endLine": 16
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "71c1118d71c5147b2a09b23f49ad5970"
+          },
+          "properties": {
+            "scrId": "SCR-0015",
+            "severity": "High",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A07:2021-Identification and Authentication Failures"
+          }
+        },
+        {
+          "ruleId": "path-traversal.user-path",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0016] File path built from request input (High, confidence Medium, Probable). Resolve the final path and verify it stays inside the base directory; prefer opaque identifiers mapped server-side; use safe helpers (send_from_directory, secure_filename)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 59,
+                  "endLine": 59
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "8468368ccc8c6fc60a800af54f750b98"
+          },
+          "properties": {
+            "scrId": "SCR-0016",
+            "severity": "High",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A01:2021-Broken Access Control"
+          }
+        },
+        {
+          "ruleId": "ssrf.user-controlled-url",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0017] Outbound request to a user-controlled URL (High, confidence Medium, Probable). Allow-list destination hosts/schemes, resolve and block private/link-local ranges, disable redirects or re-validate them, and enforce egress controls."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 65,
+                  "endLine": 65
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "dba47817257e60e72939fec53f0fbbdc"
+          },
+          "properties": {
+            "scrId": "SCR-0017",
+            "severity": "High",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A10:2021-Server-Side Request Forgery"
+          }
+        },
+        {
+          "ruleId": "xss.server-reflected",
+          "level": "error",
+          "message": {
+            "text": "[SCR-0018] Request input reflected in an HTML response (High, confidence Medium, Probable). Rely on framework auto-escaping, use textContent instead of innerHTML, sanitize rich HTML with a vetted sanitizer (e.g. DOMPurify) and deploy a strict Content-Security-Policy."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/server.js",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 13,
+                  "endLine": 13
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "8ca86baf0cb132ac35f5f5640325f5fd"
+          },
+          "properties": {
+            "scrId": "SCR-0018",
+            "severity": "High",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A03:2021-Injection"
+          }
+        },
+        {
+          "ruleId": "supply-chain.remote-script-pipe",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0019] Remote script piped to a shell (Medium, confidence High, Probable). Download to a file, verify a pinned checksum or signature, then execute; prefer package managers."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 4,
+                  "endLine": 4
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "afe98d83dae65434bc5c9bfe295b9e3b"
+          },
+          "properties": {
+            "scrId": "SCR-0019",
+            "severity": "Medium",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A08:2021-Software and Data Integrity Failures"
+          }
+        },
+        {
+          "ruleId": "container.host-namespaces",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0020] Host network/PID/IPC namespace shared (Medium, confidence High, Probable). Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/deployment.yaml",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 15,
+                  "endLine": 15
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "2e2f0cf9b91320a1ccaec9ce69535ff2"
+          },
+          "properties": {
+            "scrId": "SCR-0020",
+            "severity": "Medium",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "container.runs-as-root-k8s",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0021] Workload configured to run as root (Medium, confidence High, Probable). Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/deployment.yaml",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 20,
+                  "endLine": 20
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "769a65639f6c8ffd395fcadd49d0a106"
+          },
+          "properties": {
+            "scrId": "SCR-0021",
+            "severity": "Medium",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "container.privilege-escalation",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0022] allowPrivilegeEscalation enabled (Medium, confidence High, Probable). Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/deployment.yaml",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 21,
+                  "endLine": 21
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "fe1b4ddb6702d9a9a7a6df56835ae634"
+          },
+          "properties": {
+            "scrId": "SCR-0022",
+            "severity": "Medium",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "iac.encryption-disabled",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0023] Encryption at rest/in transit disabled (Medium, confidence High, Probable). Block public access, enable encryption at rest and in transit, and use least-privilege access policies."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/main.tf",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 29,
+                  "endLine": 29
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "0b083789e5c4c79792665d3b21db6109"
+          },
+          "properties": {
+            "scrId": "SCR-0023",
+            "severity": "Medium",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A02:2021-Cryptographic Failures"
+          }
+        },
+        {
+          "ruleId": "webserver.legacy-tls",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0024] Legacy TLS/SSL protocol enabled (Medium, confidence High, Probable). Allow only TLS 1.2 and 1.3 with modern cipher suites."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/nginx.conf",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 4,
+                  "endLine": 4
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "c25dd0a96931154bafd84b283e916be9"
+          },
+          "properties": {
+            "scrId": "SCR-0024",
+            "severity": "Medium",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A02:2021-Cryptographic Failures"
+          }
+        },
+        {
+          "ruleId": "dependencies.wildcard-version",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0025] Wildcard/latest dependency version: cors (Medium, confidence High, Probable). Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/package.json",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 8,
+                  "endLine": 8
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "81f89dedd00773620bc274d88bc15760"
+          },
+          "properties": {
+            "scrId": "SCR-0025",
+            "severity": "Medium",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A06:2021-Vulnerable and Outdated Components"
+          }
+        },
+        {
+          "ruleId": "dependencies.untrusted-source",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0026] Dependency installed from VCS/URL: internal-utils (Medium, confidence High, Probable). Prefer a released registry version pinned with a lockfile/hash; if a VCS source is required, pin to a full commit SHA."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/package.json",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 9,
+                  "endLine": 9
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "d48669604b9c01b3d90a46d2bcf2e432"
+          },
+          "properties": {
+            "scrId": "SCR-0026",
+            "severity": "Medium",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P2",
+            "owasp": "A08:2021-Software and Data Integrity Failures"
+          }
+        },
+        {
+          "ruleId": "crypto.insecure-random",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0027] Non-cryptographic PRNG for a security value (Medium, confidence Medium, Probable). Use a CSPRNG: secrets.token_urlsafe (Python), crypto.randomBytes / crypto.randomUUID (Node), SecureRandom (Java), RandomNumberGenerator (.NET)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 83,
+                  "endLine": 83
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "7ee36f862d141c1d05d6e33317e0984c"
+          },
+          "properties": {
+            "scrId": "SCR-0027",
+            "severity": "Medium",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P3",
+            "owasp": "A02:2021-Cryptographic Failures"
+          }
+        },
+        {
+          "ruleId": "config.debug-enabled",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0028] Debug mode enabled (Medium, confidence Medium, Probable). Drive debug flags from environment configuration and default to off in production."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/app.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 93,
+                  "endLine": 93
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "eae015eaca329ceb5c7582f4d8d6e757"
+          },
+          "properties": {
+            "scrId": "SCR-0028",
+            "severity": "Medium",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P3",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "config.cors-wildcard",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0029] CORS allows any origin (Medium, confidence Medium, Probable). Allow-list trusted origins; never combine wildcard/reflected origins with credentials."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/server.js",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 9,
+                  "endLine": 9
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "e9edda555dbe95603a0a12f15642b434"
+          },
+          "properties": {
+            "scrId": "SCR-0029",
+            "severity": "Medium",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P3",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "mass-assignment.request-body-binding",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0030] Model bound directly to request body (Medium, confidence Medium, Probable). Map input through an explicit allow-list or DTO/schema; never bind the raw body to persistence models."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/server.js",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 22,
+                  "endLine": 22
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "ad62681bc7717f8b4efa3f73f7fb0804"
+          },
+          "properties": {
+            "scrId": "SCR-0030",
+            "severity": "Medium",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P3",
+            "owasp": "A08:2021-Software and Data Integrity Failures"
+          }
+        },
+        {
+          "ruleId": "auth.jwt.decode-without-verify-node",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0031] jsonwebtoken decode() does not verify signatures (Medium, confidence Medium, Needs Manual Review). Always verify the signature with an explicit algorithm allow-list, and validate exp, nbf, iss and aud."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/server.js",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 28,
+                  "endLine": 28
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "464e348a776c0c04b7bad2de93a7f03b"
+          },
+          "properties": {
+            "scrId": "SCR-0031",
+            "severity": "Medium",
+            "confidence": "Medium",
+            "status": "Needs Manual Review",
+            "priority": "P3",
+            "owasp": "A07:2021-Identification and Authentication Failures"
+          }
+        },
+        {
+          "ruleId": "errors.stack-trace-in-response",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0032] Exception details returned to the client (Medium, confidence Medium, Probable). Return generic error messages with a correlation id and log details server-side."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/app/server.js",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 33,
+                  "endLine": 33
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "538c7200b015bfc27a09333889172c6b"
+          },
+          "properties": {
+            "scrId": "SCR-0032",
+            "severity": "Medium",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P3",
+            "owasp": "A04:2021-Insecure Design"
+          }
+        },
+        {
+          "ruleId": "iac.network.open-to-world",
+          "level": "warning",
+          "message": {
+            "text": "[SCR-0033] Ingress open to 0.0.0.0/0 (Medium, confidence Medium, Probable). Restrict CIDR ranges to known networks, place services behind load balancers/WAF and use private subnets."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/main.tf",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 8,
+                  "endLine": 8
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "4ad3276515c0f6687082460b6ac3ced4"
+          },
+          "properties": {
+            "scrId": "SCR-0033",
+            "severity": "Medium",
+            "confidence": "Medium",
+            "status": "Probable",
+            "priority": "P3",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "container.docker.unpinned-base-image",
+          "level": "note",
+          "message": {
+            "text": "[SCR-0034] Base image not pinned (latest or no tag) (Low, confidence High, Probable). Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 1,
+                  "endLine": 1
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "1b5b01ca2f65f0b11daebf5a9c31e001"
+          },
+          "properties": {
+            "scrId": "SCR-0034",
+            "severity": "Low",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P3",
+            "owasp": "A08:2021-Software and Data Integrity Failures"
+          }
+        },
+        {
+          "ruleId": "webserver.directory-listing",
+          "level": "note",
+          "message": {
+            "text": "[SCR-0035] Directory listing enabled (Low, confidence High, Probable). Disable directory listing and version banners."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/nginx.conf",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 5,
+                  "endLine": 5
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "bb72a9729ff2771ecf736f2fa2a04da4"
+          },
+          "properties": {
+            "scrId": "SCR-0035",
+            "severity": "Low",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P3",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "dependencies.not-pinned",
+          "level": "note",
+          "message": {
+            "text": "[SCR-0036] 1 dependencies without an exact pinned version (Low, confidence High, Probable). Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/package.json",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 6,
+                  "endLine": 6
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "83dce82fb0220dd4ae167239e1d1c195"
+          },
+          "properties": {
+            "scrId": "SCR-0036",
+            "severity": "Low",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P3",
+            "owasp": "A06:2021-Vulnerable and Outdated Components"
+          }
+        },
+        {
+          "ruleId": "dependencies.not-pinned",
+          "level": "note",
+          "message": {
+            "text": "[SCR-0037] 2 dependencies without an exact pinned version (Low, confidence High, Probable). Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/requirements.txt",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 2,
+                  "endLine": 3
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "8c3a7a5ebfa14512ad07422fa58b47e2"
+          },
+          "properties": {
+            "scrId": "SCR-0037",
+            "severity": "Low",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P3",
+            "owasp": "A06:2021-Vulnerable and Outdated Components"
+          }
+        },
+        {
+          "ruleId": "cicd.gha.missing-permissions",
+          "level": "note",
+          "message": {
+            "text": "[SCR-0038] Workflow without explicit permissions block (Low, confidence Medium, Needs Manual Review). Use least-privilege `permissions:`, never interpolate untrusted event fields into `run:` (use env vars), avoid checking out PR code in pull_request_target, and pin actions to full commit SHAs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/.github/workflows/triage.yml",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 3,
+                  "endLine": 3
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "a6bc5be53b47b7e1aad801db95a0321f"
+          },
+          "properties": {
+            "scrId": "SCR-0038",
+            "severity": "Low",
+            "confidence": "Medium",
+            "status": "Needs Manual Review",
+            "priority": "P3",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "container.docker.no-user",
+          "level": "note",
+          "message": {
+            "text": "[SCR-0039] Dockerfile has no USER instruction (defaults to root) (Low, confidence Medium, Needs Manual Review). Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 1,
+                  "endLine": 1
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "b071eb242292326078e01c2beebfc050"
+          },
+          "properties": {
+            "scrId": "SCR-0039",
+            "severity": "Low",
+            "confidence": "Medium",
+            "status": "Needs Manual Review",
+            "priority": "P3",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "cicd.gha.unpinned-action",
+          "level": "note",
+          "message": {
+            "text": "[SCR-0041] Third-party action not pinned to a commit SHA (Informational, confidence High, Probable). Use least-privilege `permissions:`, never interpolate untrusted event fields into `run:` (use env vars), avoid checking out PR code in pull_request_target, and pin actions to full commit SHAs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/.github/workflows/triage.yml",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 10,
+                  "endLine": 10
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "cb1aca0c843b2c8b8af636cb45463695"
+          },
+          "properties": {
+            "scrId": "SCR-0041",
+            "severity": "Informational",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P4",
+            "owasp": "A08:2021-Software and Data Integrity Failures"
+          }
+        },
+        {
+          "ruleId": "webserver.version-disclosure",
+          "level": "note",
+          "message": {
+            "text": "[SCR-0042] Server version banner enabled (Informational, confidence High, Probable). Disable directory listing and version banners."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/deploy/nginx.conf",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 6,
+                  "endLine": 6
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "2c3c28fc8d300e80f0591d0f3a856f79"
+          },
+          "properties": {
+            "scrId": "SCR-0042",
+            "severity": "Informational",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P4",
+            "owasp": "A05:2021-Security Misconfiguration"
+          }
+        },
+        {
+          "ruleId": "dependencies.missing-lockfile",
+          "level": "note",
+          "message": {
+            "text": "[SCR-0043] npm project without a lockfile (Informational, confidence High, Probable). Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/vulnerable-demo/package.json",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 1,
+                  "endLine": 1
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "secureCodeReviewer/v1": "b288151f9d0e70a4a4d81259c452ad4a"
+          },
+          "properties": {
+            "scrId": "SCR-0043",
+            "severity": "Informational",
+            "confidence": "High",
+            "status": "Probable",
+            "priority": "P4",
+            "owasp": "A06:2021-Vulnerable and Outdated Components"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+# Test-only dependencies. The skill's scripts use the Python standard library only.
+pytest>=7.4
+jsonschema>=4.18

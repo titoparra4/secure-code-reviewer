@@ -1,0 +1,2248 @@
+{
+  "schema_version": "1.0.0",
+  "tool": {
+    "name": "secure-code-reviewer",
+    "version": "1.0.0",
+    "component": "normalize_findings"
+  },
+  "generated_at": "2026-11-08T00:00:00Z",
+  "stage": "normalized",
+  "scan": {
+    "target": "examples/vulnerable-demo",
+    "mode": "full",
+    "files_scanned": 11,
+    "files_skipped": 0,
+    "files_skipped_by_reason": {},
+    "changed_files_only": false,
+    "limits": {
+      "max_file_bytes": 1000000,
+      "max_files": 20000
+    },
+    "network": {
+      "osv": false,
+      "external_tools": []
+    },
+    "rules_evaluated": 68
+  },
+  "inventory": {
+    "languages": {
+      "YAML": 3,
+      "Dockerfile": 1,
+      "JavaScript": 1,
+      "Python": 1,
+      "Terraform": 1
+    },
+    "frameworks": [
+      "Express",
+      "Flask"
+    ],
+    "auth_mechanisms": [
+      "JWT"
+    ],
+    "entry_points": [
+      "app/app.py",
+      "app/server.js"
+    ],
+    "route_handlers_detected": 12,
+    "config_files": [
+      ".github/workflows/triage.yml",
+      "Dockerfile",
+      "deploy/deployment.yaml",
+      "deploy/main.tf",
+      "deploy/nginx.conf",
+      "docker-compose.yml"
+    ],
+    "manifests": [
+      "package.json",
+      "requirements.txt"
+    ]
+  },
+  "coverage": [
+    {
+      "category": "Injection (SQL/NoSQL/Command/Code/SSTI)",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "heuristic line rules + intra-file taint"
+    },
+    {
+      "category": "Cross-Site Scripting (XSS)",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "heuristic sinks"
+    },
+    {
+      "category": "Cross-Site Request Forgery (CSRF)",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "disabled-protection markers only"
+    },
+    {
+      "category": "Server-Side Request Forgery (SSRF) / Open Redirect",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "sinks reached by request input"
+    },
+    {
+      "category": "Path Traversal / File Upload",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "sinks reached by request input"
+    },
+    {
+      "category": "Insecure Deserialization / XXE",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "unsafe API usage"
+    },
+    {
+      "category": "Mass Assignment / Prototype Pollution",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "request-body binding patterns"
+    },
+    {
+      "category": "Cryptography (hashing, ciphers, randomness, TLS)",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "unsafe API usage"
+    },
+    {
+      "category": "Authentication & JWT validation",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "disabled verification markers"
+    },
+    {
+      "category": "Session management (cookies)",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "insecure cookie flags"
+    },
+    {
+      "category": "Error handling & sensitive logging",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "heuristic patterns"
+    },
+    {
+      "category": "Secrets exposure",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "vendor patterns + contextual generic assignments"
+    },
+    {
+      "category": "Containers / Kubernetes / Compose",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "configuration rules"
+    },
+    {
+      "category": "Terraform / Cloud IaC",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "configuration rules"
+    },
+    {
+      "category": "CI/CD pipelines",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "configuration rules"
+    },
+    {
+      "category": "Web server TLS & configuration",
+      "status": "partial",
+      "method": "heuristic",
+      "notes": "configuration rules"
+    },
+    {
+      "category": "Dependencies (manifests & lockfiles)",
+      "status": "partial",
+      "method": "inventory",
+      "notes": "offline inventory; vulnerability status Not Verified"
+    },
+    {
+      "category": "Business logic flaws",
+      "status": "not_reviewed",
+      "method": "none",
+      "notes": "requires domain understanding; not detectable by pattern rules"
+    },
+    {
+      "category": "Race conditions with security impact",
+      "status": "not_reviewed",
+      "method": "none",
+      "notes": "only insecure temp-file APIs are flagged; check-then-act races require manual review"
+    },
+    {
+      "category": "Brute-force protection / MFA / password policy",
+      "status": "not_reviewed",
+      "method": "none",
+      "notes": "requires reviewing authentication flows end to end"
+    },
+    {
+      "category": "Broken Access Control / IDOR / authorization policies (RBAC/ABAC)",
+      "status": "reviewed",
+      "method": "manual",
+      "notes": "Agent read every route handler in app/app.py and app/server.js and checked object ownership and role checks."
+    }
+  ],
+  "pending_verifications": [
+    "Known-vulnerability status of dependencies is 'Not Verified' (offline run). Re-run with --osv, or use OSV-Scanner / GitHub Dependabot / Trivy.",
+    "Heuristic findings are candidates: each needs triage (Confirmed / Probable / False Positive) by the agent or a reviewer."
+  ],
+  "tool_errors": [],
+  "dependencies": [
+    {
+      "name": "express",
+      "spec": "^4.17.1",
+      "version": null,
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "line": 6,
+      "source": "registry",
+      "pinned": false,
+      "vulnerability_status": "Not Verified",
+      "advisories": []
+    },
+    {
+      "name": "jsonwebtoken",
+      "spec": "8.5.1",
+      "version": "8.5.1",
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "line": 7,
+      "source": "registry",
+      "pinned": true,
+      "vulnerability_status": "Not Verified",
+      "advisories": []
+    },
+    {
+      "name": "cors",
+      "spec": "*",
+      "version": null,
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "line": 8,
+      "source": "registry",
+      "pinned": false,
+      "vulnerability_status": "Not Verified",
+      "advisories": []
+    },
+    {
+      "name": "internal-utils",
+      "spec": "git+https://git.example.com/acme/internal-utils.git",
+      "version": null,
+      "ecosystem": "npm",
+      "manifest": "package.json",
+      "line": 9,
+      "source": "url",
+      "pinned": false,
+      "vulnerability_status": "Not Verified",
+      "advisories": []
+    },
+    {
+      "name": "flask",
+      "spec": "==2.0.1",
+      "version": "2.0.1",
+      "ecosystem": "PyPI",
+      "manifest": "requirements.txt",
+      "line": 1,
+      "source": "registry",
+      "pinned": true,
+      "vulnerability_status": "Not Verified",
+      "advisories": []
+    },
+    {
+      "name": "requests",
+      "spec": "",
+      "version": null,
+      "ecosystem": "PyPI",
+      "manifest": "requirements.txt",
+      "line": 2,
+      "source": "registry",
+      "pinned": false,
+      "vulnerability_status": "Not Verified",
+      "advisories": []
+    },
+    {
+      "name": "PyYAML",
+      "spec": ">=5.1",
+      "version": null,
+      "ecosystem": "PyPI",
+      "manifest": "requirements.txt",
+      "line": 3,
+      "source": "registry",
+      "pinned": false,
+      "vulnerability_status": "Not Verified",
+      "advisories": []
+    },
+    {
+      "name": "pyjwt",
+      "spec": "==1.7.1",
+      "version": "1.7.1",
+      "ecosystem": "PyPI",
+      "manifest": "requirements.txt",
+      "line": 4,
+      "source": "registry",
+      "pinned": true,
+      "vulnerability_status": "Not Verified",
+      "advisories": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "SCR-0001",
+      "fingerprint": "51c3d2e32ebc6797193296d7206cff85",
+      "rule_id": "secrets.connection-string-password",
+      "title": "Credentials in database/broker connection string",
+      "category": "Secrets Exposure",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-798",
+      "owasp_category": "A07:2021-Identification and Authentication Failures",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 17,
+        "end_line": 17
+      },
+      "evidence": {
+        "description": "A value matching the 'connection-string-password' pattern was found. The value is redacted. If it is real: revoke/rotate it and review provider logs for misuse.",
+        "sanitized_code": "DATABASE_URL = \"postgresql://demo_user:[REDACTED:connection-string-password:len=17]@db.internal:5432/shop\""
+      },
+      "impact": "Anyone with access to the source, history or build artifacts can use the credential.",
+      "exploitability": "Severity depends on whether the value is real, its privileges and where it is valid.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Remove the value from source, load it from a secret manager or environment, and if it is (or may be) real: revoke/rotate it, review usage logs for abuse and purge it from git history.",
+        "fixed_code_example": "API_KEY = os.environ[\"PAYMENTS_API_KEY\"]",
+        "security_test": "Run a secrets scanner (this skill's secrets mode or gitleaks) in CI and assert zero unapproved findings.",
+        "regression_test": "Assert the application reads the value from configuration and fails clearly when missing.",
+        "verification": "Confirm rotation with the provider; re-run the secrets scan; check git history (e.g. `git log -S`)."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "value redacted; never stored in the report"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0002",
+      "fingerprint": "1573357b88c79be42f57994c3d2285b0",
+      "rule_id": "injection.sql.string-built-query",
+      "title": "SQL query built with string interpolation",
+      "category": "SQL Injection",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-89",
+      "owasp_category": "A03:2021-Injection",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 29,
+        "end_line": 29
+      },
+      "evidence": {
+        "description": "A SQL statement is built by string formatting/concatenation instead of bound parameters.",
+        "sanitized_code": "cur.execute(f\"SELECT id, email FROM users WHERE email = '{email}'\")"
+      },
+      "impact": "If attacker-controlled data reaches the query, an attacker may read, modify or delete data, bypass authentication or, depending on the DBMS, execute commands.",
+      "exploitability": "Exploitable when any interpolated value is attacker-influenced and not strictly validated (e.g. integer cast or allow-list).",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Use parameterized queries / prepared statements or the ORM query builder. Never interpolate values into SQL; allow-list identifiers (column/table names) if they must be dynamic.",
+        "fixed_code_example": "cursor.execute(\"SELECT * FROM users WHERE email = %s\", (email,))",
+        "security_test": "Call the code path with a controlled payload such as `' OR '1'='1` against a local test database and assert that no extra rows are returned and no SQL error leaks.",
+        "regression_test": "Unit test that asserts the query is executed with placeholders and a separate parameters tuple (mock the cursor) and that legitimate lookups still return the expected row.",
+        "verification": "Run the regression test and the existing test suite; confirm the payload is treated as a literal value."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "request-derived data appears on the same line"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/89.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "title": "Insecure Direct Object Reference on invoice retrieval",
+      "category": "Broken Access Control",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Confirmed",
+      "cwe": "CWE-639",
+      "owasp_category": "A01:2021-Broken Access Control",
+      "owasp_api_category": "API1:2023-Broken Object Level Authorization",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 41,
+        "end_line": 46
+      },
+      "evidence": {
+        "description": "The handler loads an invoice by the path parameter invoice_id and returns it without checking that the invoice belongs to the authenticated user. No authorization decorator or ownership filter exists on this route or in a before_request hook (reviewed app/app.py in full).",
+        "sanitized_code": "cur.execute(\"SELECT * FROM invoices WHERE id = ?\", (invoice_id,))\nreturn jsonify(cur.fetchone())"
+      },
+      "impact": "Any user who can reach the endpoint can enumerate invoice ids and read other customers' invoices (personal and financial data).",
+      "exploitability": "Trivial when invoice ids are sequential; requires only network access to the endpoint.",
+      "business_impact": "Exposure of customer financial data; likely reportable privacy incident.",
+      "remediation": {
+        "recommendation": "Scope the query to the current user (WHERE id = ? AND owner_id = ?) and return 404 when the invoice is not owned by the caller. Centralize the check in a reusable authorization helper.",
+        "fixed_code_example": "cur.execute(\"SELECT * FROM invoices WHERE id = ? AND owner_id = ?\", (invoice_id, current_user.id))\nrow = cur.fetchone()\nif row is None:\n    abort(404)",
+        "security_test": "With two local test users A and B, request B's invoice id as A and assert 404 and no invoice data in the body.",
+        "regression_test": "Assert that A can still read A's own invoice (200, same payload as before).",
+        "verification": "Run both tests; review the other object-returning routes for the same pattern."
+      },
+      "effort": "Low",
+      "verification": {
+        "method": "manual",
+        "tool": "agent",
+        "reproduced": false,
+        "notes": [
+          "confirmed by code reading; no dynamic test executed"
+        ]
+      },
+      "rule_id": "agent.insecure-direct-object-reference-on-invoice-retrieval",
+      "source": "agent",
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/639.html"
+      ],
+      "fingerprint": "a8be2d9e151c09614586bcf962ab5479",
+      "id": "SCR-0003",
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0004",
+      "fingerprint": "574d11c0eeae32352766017c0a474fbd",
+      "rule_id": "injection.command.python",
+      "title": "OS command execution through a shell",
+      "category": "Command Injection",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-78",
+      "owasp_category": "A03:2021-Injection",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 52,
+        "end_line": 52
+      },
+      "evidence": {
+        "description": "An OS command is executed through a shell or with a dynamically built command string.",
+        "sanitized_code": "output = subprocess.check_output(\"ping -c 1 \" + host, shell=True)"
+      },
+      "impact": "Attacker-controlled data in the command can lead to arbitrary command execution with the application's privileges.",
+      "exploitability": "Exploitable when any part of the command string is attacker-influenced.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Avoid the shell: pass an argument list (shell=False / execFile / ProcessBuilder with separate args), validate input against an allow-list and prefer native libraries over shelling out.",
+        "fixed_code_example": "subprocess.run([\"ping\", \"-c\", \"1\", host], check=True, timeout=5)  # host validated against an allow-list/regex",
+        "security_test": "In a sandbox, pass `127.0.0.1; id` and assert the command fails validation and `id` is never executed (mock subprocess).",
+        "regression_test": "Assert subprocess is called with a list and shell=False, and that valid hosts still work.",
+        "verification": "Run the tests; grep for remaining shell=True / exec( usages in the module."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "request-derived data appears to reach this line (name-based, intra-file)"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0005",
+      "fingerprint": "2e3e0d593f1ecacbe78348802a67b342",
+      "rule_id": "deserialization.python",
+      "title": "Unsafe deserialization (pickle/marshal/yaml.load)",
+      "category": "Insecure Deserialization",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-502",
+      "owasp_category": "A08:2021-Software and Data Integrity Failures",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 70,
+        "end_line": 70
+      },
+      "evidence": {
+        "description": "Data is deserialized with a format/loader that can instantiate arbitrary objects.",
+        "sanitized_code": "config = yaml.load(request.data)"
+      },
+      "impact": "Deserializing attacker-controlled data can lead to remote code execution or object injection.",
+      "exploitability": "Exploitable when the serialized data can be influenced by an attacker (requests, cookies, queues, files, caches).",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Use data-only formats (JSON) or safe loaders (yaml.safe_load). If native serialization is unavoidable, sign/authenticate the payload and restrict allowed types.",
+        "fixed_code_example": "data = yaml.safe_load(stream)",
+        "security_test": "Feed a benign gadget payload (e.g. a YAML !!python/object tag) and assert it is rejected.",
+        "regression_test": "Assert valid documents still load to the same structures.",
+        "verification": "Run tests; confirm no unsafe loader remains."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "request-derived data appears to reach this line (name-based, intra-file)"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/502.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0006",
+      "fingerprint": "685136961c437033fddd16f69a3da5a1",
+      "rule_id": "auth.jwt.signature-not-verified",
+      "title": "JWT decoded without signature verification",
+      "category": "Broken Authentication (JWT)",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-347",
+      "owasp_category": "A07:2021-Identification and Authentication Failures",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 77,
+        "end_line": 77
+      },
+      "evidence": {
+        "description": "JWT validation is weakened (signature, algorithm or claim checks disabled).",
+        "sanitized_code": "claims = jwt.decode(token, options={\"verify_signature\": False})"
+      },
+      "impact": "Attackers may forge or replay tokens, impersonating users or escalating privileges.",
+      "exploitability": "Exploitable when the token is used for authentication/authorization decisions.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Always verify the signature with an explicit algorithm allow-list, and validate exp, nbf, iss and aud.",
+        "fixed_code_example": "jwt.decode(token, key, algorithms=[\"RS256\"], audience=AUD, issuer=ISS)",
+        "security_test": "Present a token signed with a different key and an `alg: none` token; assert both are rejected (401).",
+        "regression_test": "Assert valid tokens are still accepted and expired tokens are rejected.",
+        "verification": "Run tests covering signature, expiry, issuer and audience."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/347.html"
+      ],
+      "owasp_api_category": "API2:2023-Broken Authentication",
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0007",
+      "fingerprint": "9ff2c0dc892f4d23f425e33ae46bb9c4",
+      "rule_id": "crypto.weak-hash",
+      "title": "Weak password hashing (fast, unsalted hash)",
+      "category": "Insecure Cryptography",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-916",
+      "owasp_category": "A02:2021-Cryptographic Failures",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 82,
+        "end_line": 82
+      },
+      "evidence": {
+        "description": "A weak hash algorithm (MD5/SHA-1) is used.",
+        "sanitized_code": "password_hash = hashlib.md5(password.encode()).hexdigest()"
+      },
+      "impact": "If used for passwords, signatures or integrity, collisions or fast brute force undermine the control.",
+      "exploitability": "Only a vulnerability when the hash protects a security property; checksums/cache keys are usually acceptable.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "For passwords use Argon2id, scrypt or bcrypt with per-user salt; for integrity use SHA-256+ or HMAC.",
+        "fixed_code_example": "from argon2 import PasswordHasher\nhash = PasswordHasher().hash(password)",
+        "security_test": "Assert stored password hashes use the new algorithm prefix (e.g. $argon2id$).",
+        "regression_test": "Assert login still works, including a migration path for legacy hashes.",
+        "verification": "Run tests; confirm the purpose of each MD5/SHA-1 usage."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "password-related identifiers near the hash call"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/916.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0008",
+      "fingerprint": "f9d81014334bd2e8181f0ac06cb75efb",
+      "rule_id": "injection.command.node",
+      "title": "child_process exec with a dynamic command",
+      "category": "Command Injection",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-78",
+      "owasp_category": "A03:2021-Injection",
+      "location": {
+        "file": "app/server.js",
+        "start_line": 17,
+        "end_line": 17
+      },
+      "evidence": {
+        "description": "An OS command is executed through a shell or with a dynamically built command string.",
+        "sanitized_code": "exec(`nslookup ${req.query.domain}`, (err, stdout) => res.send(stdout));"
+      },
+      "impact": "Attacker-controlled data in the command can lead to arbitrary command execution with the application's privileges.",
+      "exploitability": "Exploitable when any part of the command string is attacker-influenced.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Avoid the shell: pass an argument list (shell=False / execFile / ProcessBuilder with separate args), validate input against an allow-list and prefer native libraries over shelling out.",
+        "fixed_code_example": "subprocess.run([\"ping\", \"-c\", \"1\", host], check=True, timeout=5)  # host validated against an allow-list/regex",
+        "security_test": "In a sandbox, pass `127.0.0.1; id` and assert the command fails validation and `id` is never executed (mock subprocess).",
+        "regression_test": "Assert subprocess is called with a list and shell=False, and that valid hosts still work.",
+        "verification": "Run the tests; grep for remaining shell=True / exec( usages in the module."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "request-derived data appears to reach this line (name-based, intra-file)"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/78.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0009",
+      "fingerprint": "82c7128452f22dc4cbb9b05b60082640",
+      "rule_id": "container.dangerous-capabilities",
+      "title": "Dangerous Linux capabilities added",
+      "category": "Container Security",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-250",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "deploy/deployment.yaml",
+        "start_line": 24,
+        "end_line": 24
+      },
+      "evidence": {
+        "description": "The container/workload runs with elevated privileges or host access.",
+        "sanitized_code": "- SYS_ADMIN"
+      },
+      "impact": "A compromise of the container can escalate to the host or cluster.",
+      "exploitability": "Relevant if the workload is deployed with this configuration.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem.",
+        "fixed_code_example": "securityContext:\n  runAsNonRoot: true\n  allowPrivilegeEscalation: false\n  capabilities: { drop: [\"ALL\"] }",
+        "security_test": "Use a policy check (e.g. Kubernetes Pod Security 'restricted' admission, or `docker inspect`) to assert the settings.",
+        "regression_test": "Assert the service still starts and passes health checks as non-root.",
+        "verification": "Deploy to a test cluster/namespace with restricted policy."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0010",
+      "fingerprint": "24e9a7b6f9803853a6681db36ad3d1d8",
+      "rule_id": "iac.storage.public-acl",
+      "title": "Storage made publicly accessible",
+      "category": "Infrastructure Exposure",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-732",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "deploy/main.tf",
+        "start_line": 21,
+        "end_line": 21
+      },
+      "evidence": {
+        "description": "Storage or data service is publicly accessible or unencrypted.",
+        "sanitized_code": "acl    = \"public-read\""
+      },
+      "impact": "Data exposure or tampering.",
+      "exploitability": "Relevant for non-public data.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Block public access, enable encryption at rest and in transit, and use least-privilege access policies.",
+        "fixed_code_example": "acl = \"private\"\nblock_public_acls = true",
+        "security_test": "Policy-as-code check in CI.",
+        "regression_test": "Verify the application can still read/write with its role.",
+        "verification": "Run `terraform plan`."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/732.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0011",
+      "fingerprint": "252769500358a6e334eb2fc29a7f1a9e",
+      "rule_id": "iac.storage.public-acl",
+      "title": "Storage made publicly accessible",
+      "category": "Infrastructure Exposure",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-732",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "deploy/main.tf",
+        "start_line": 28,
+        "end_line": 28
+      },
+      "evidence": {
+        "description": "Storage or data service is publicly accessible or unencrypted.",
+        "sanitized_code": "publicly_accessible = true"
+      },
+      "impact": "Data exposure or tampering.",
+      "exploitability": "Relevant for non-public data.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Block public access, enable encryption at rest and in transit, and use least-privilege access policies.",
+        "fixed_code_example": "acl = \"private\"\nblock_public_acls = true",
+        "security_test": "Policy-as-code check in CI.",
+        "regression_test": "Verify the application can still read/write with its role.",
+        "verification": "Run `terraform plan`."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/732.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0012",
+      "fingerprint": "c04158fe1b504d68827798cc32777cf7",
+      "rule_id": "container.privileged",
+      "title": "Privileged container",
+      "category": "Container Security",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-250",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "docker-compose.yml",
+        "start_line": 4,
+        "end_line": 4
+      },
+      "evidence": {
+        "description": "The container/workload runs with elevated privileges or host access.",
+        "sanitized_code": "privileged: true"
+      },
+      "impact": "A compromise of the container can escalate to the host or cluster.",
+      "exploitability": "Relevant if the workload is deployed with this configuration.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem.",
+        "fixed_code_example": "securityContext:\n  runAsNonRoot: true\n  allowPrivilegeEscalation: false\n  capabilities: { drop: [\"ALL\"] }",
+        "security_test": "Use a policy check (e.g. Kubernetes Pod Security 'restricted' admission, or `docker inspect`) to assert the settings.",
+        "regression_test": "Assert the service still starts and passes health checks as non-root.",
+        "verification": "Deploy to a test cluster/namespace with restricted policy."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0013",
+      "fingerprint": "b52bc1dbeb78f375010139fb2c152faf",
+      "rule_id": "container.docker-socket-mount",
+      "title": "Docker socket mounted into a container",
+      "category": "Container Security",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-250",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "docker-compose.yml",
+        "start_line": 8,
+        "end_line": 8
+      },
+      "evidence": {
+        "description": "The container/workload runs with elevated privileges or host access.",
+        "sanitized_code": "- /var/run/docker.sock:/var/run/docker.sock"
+      },
+      "impact": "A compromise of the container can escalate to the host or cluster.",
+      "exploitability": "Relevant if the workload is deployed with this configuration.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem.",
+        "fixed_code_example": "securityContext:\n  runAsNonRoot: true\n  allowPrivilegeEscalation: false\n  capabilities: { drop: [\"ALL\"] }",
+        "security_test": "Use a policy check (e.g. Kubernetes Pod Security 'restricted' admission, or `docker inspect`) to assert the settings.",
+        "regression_test": "Assert the service still starts and passes health checks as non-root.",
+        "verification": "Deploy to a test cluster/namespace with restricted policy."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "remediation_priority": "P1"
+    },
+    {
+      "id": "SCR-0014",
+      "fingerprint": "a0511d6305ec393619ed3e79a280ee55",
+      "rule_id": "cicd.gha.script-injection",
+      "title": "Untrusted GitHub event data interpolated into a script",
+      "category": "CI/CD Security",
+      "severity": "High",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-94",
+      "owasp_category": "A03:2021-Injection",
+      "location": {
+        "file": ".github/workflows/triage.yml",
+        "start_line": 12,
+        "end_line": 12
+      },
+      "evidence": {
+        "description": "CI/CD workflow configuration allows untrusted input or excessive privileges.",
+        "sanitized_code": "run: echo \"New issue: ${{ github.event.issue.title }}\""
+      },
+      "impact": "Attackers may execute code in CI, steal secrets or push malicious artifacts.",
+      "exploitability": "Exploitable via pull requests, issues or comments from untrusted users, depending on triggers.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Use least-privilege `permissions:`, never interpolate untrusted event fields into `run:` (use env vars), avoid checking out PR code in pull_request_target, and pin actions to full commit SHAs.",
+        "fixed_code_example": "env:\n  TITLE: ${{ github.event.pull_request.title }}\nrun: echo \"$TITLE\"",
+        "security_test": "Review with actionlint/zizmor or equivalent workflow linters.",
+        "regression_test": "Run the workflow on a test PR.",
+        "verification": "Check the workflow run logs and permissions summary."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/94.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0015",
+      "fingerprint": "71c1118d71c5147b2a09b23f49ad5970",
+      "rule_id": "secrets.generic-secret-assignment",
+      "title": "Hardcoded secret or password",
+      "category": "Secrets Exposure",
+      "severity": "High",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-798",
+      "owasp_category": "A07:2021-Identification and Authentication Failures",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 16,
+        "end_line": 16
+      },
+      "evidence": {
+        "description": "A value matching the 'generic-secret-assignment' pattern was found. The value is redacted. If it is real: revoke/rotate it and review provider logs for misuse.",
+        "sanitized_code": "PAYMENTS_API_KEY = \"[REDACTED:generic-secret-assignment:len=26]\""
+      },
+      "impact": "Anyone with access to the source, history or build artifacts can use the credential.",
+      "exploitability": "Severity depends on whether the value is real, its privileges and where it is valid.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Remove the value from source, load it from a secret manager or environment, and if it is (or may be) real: revoke/rotate it, review usage logs for abuse and purge it from git history.",
+        "fixed_code_example": "API_KEY = os.environ[\"PAYMENTS_API_KEY\"]",
+        "security_test": "Run a secrets scanner (this skill's secrets mode or gitleaks) in CI and assert zero unapproved findings.",
+        "regression_test": "Assert the application reads the value from configuration and fails clearly when missing.",
+        "verification": "Confirm rotation with the provider; re-run the secrets scan; check git history (e.g. `git log -S`)."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "value redacted; never stored in the report"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0016",
+      "fingerprint": "8468368ccc8c6fc60a800af54f750b98",
+      "rule_id": "path-traversal.user-path",
+      "title": "File path built from request input",
+      "category": "Path Traversal",
+      "severity": "High",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-22",
+      "owasp_category": "A01:2021-Broken Access Control",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 59,
+        "end_line": 59
+      },
+      "evidence": {
+        "description": "A filesystem path is built from request input.",
+        "sanitized_code": "return send_file(os.path.join(\"/srv/reports\", name))"
+      },
+      "impact": "Path traversal may allow reading or overwriting files outside the intended directory.",
+      "exploitability": "Exploitable when the input can contain `../`, absolute paths or encoded separators and no canonicalization check exists.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Resolve the final path and verify it stays inside the base directory; prefer opaque identifiers mapped server-side; use safe helpers (send_from_directory, secure_filename).",
+        "fixed_code_example": "target = (BASE_DIR / name).resolve()\nif not target.is_relative_to(BASE_DIR.resolve()):\n    abort(400)",
+        "security_test": "Request `../../etc/passwd` and `..%2f..%2f` against a local instance and assert 400/404 without file contents.",
+        "regression_test": "Assert valid file names inside the base directory are still served.",
+        "verification": "Run tests; check every file access derived from user input."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "request-derived data appears to reach this line (name-based, intra-file)"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/22.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0017",
+      "fingerprint": "dba47817257e60e72939fec53f0fbbdc",
+      "rule_id": "ssrf.user-controlled-url",
+      "title": "Outbound request to a user-controlled URL",
+      "category": "Server-Side Request Forgery",
+      "severity": "High",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-918",
+      "owasp_category": "A10:2021-Server-Side Request Forgery",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 65,
+        "end_line": 65
+      },
+      "evidence": {
+        "description": "An outbound HTTP request uses a URL derived from user input.",
+        "sanitized_code": "return requests.get(url, timeout=5).text"
+      },
+      "impact": "SSRF can reach internal services, cloud metadata endpoints or bypass network controls.",
+      "exploitability": "Exploitable when the attacker controls scheme/host and no allow-list or egress filtering exists.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Allow-list destination hosts/schemes, resolve and block private/link-local ranges, disable redirects or re-validate them, and enforce egress controls.",
+        "fixed_code_example": "if urlparse(url).hostname not in ALLOWED_HOSTS:\n    abort(400)",
+        "security_test": "Request `http://169.254.169.254/` and `http://127.0.0.1:22` against a local instance (mock the HTTP client) and assert they are rejected.",
+        "regression_test": "Assert allowed hosts are still fetched.",
+        "verification": "Run tests; confirm redirects are validated too."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "request-derived data appears to reach this line (name-based, intra-file)"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/918.html"
+      ],
+      "owasp_api_category": "API7:2023-Server Side Request Forgery",
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0018",
+      "fingerprint": "8ca86baf0cb132ac35f5f5640325f5fd",
+      "rule_id": "xss.server-reflected",
+      "title": "Request input reflected in an HTML response",
+      "category": "Cross-Site Scripting (XSS)",
+      "severity": "High",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-79",
+      "owasp_category": "A03:2021-Injection",
+      "location": {
+        "file": "app/server.js",
+        "start_line": 13,
+        "end_line": 13
+      },
+      "evidence": {
+        "description": "Data is written into HTML without context-aware escaping, or escaping is explicitly disabled.",
+        "sanitized_code": "res.send(`<h1>Hello ${name}</h1>`);"
+      },
+      "impact": "Cross-site scripting allows session hijacking, account takeover actions and content spoofing in the victim's browser.",
+      "exploitability": "Exploitable when attacker-controlled data reaches the sink without encoding and no strict CSP mitigates it.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Rely on framework auto-escaping, use textContent instead of innerHTML, sanitize rich HTML with a vetted sanitizer (e.g. DOMPurify) and deploy a strict Content-Security-Policy.",
+        "fixed_code_example": "element.textContent = userValue;",
+        "security_test": "Render `<img src=x onerror=alert(1)>` in a local test and assert it appears escaped in the output DOM/HTML.",
+        "regression_test": "Assert normal text still renders identically.",
+        "verification": "Run tests; check the response/DOM for escaped output."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "request-derived data appears to reach this line (name-based, intra-file)"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/79.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0019",
+      "fingerprint": "afe98d83dae65434bc5c9bfe295b9e3b",
+      "rule_id": "supply-chain.remote-script-pipe",
+      "title": "Remote script piped to a shell",
+      "category": "Supply Chain",
+      "severity": "Medium",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-494",
+      "owasp_category": "A08:2021-Software and Data Integrity Failures",
+      "location": {
+        "file": "Dockerfile",
+        "start_line": 4,
+        "end_line": 4
+      },
+      "evidence": {
+        "description": "A remote script is downloaded and executed without integrity verification.",
+        "sanitized_code": "RUN curl -fsSL https://install.example.com/setup.sh | sh"
+      },
+      "impact": "A compromised server or MITM yields code execution in the build/runtime environment.",
+      "exploitability": "Exploitable if the remote source or transport is compromised.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Download to a file, verify a pinned checksum or signature, then execute; prefer package managers.",
+        "fixed_code_example": "curl -fsSLo install.sh URL && echo \"<sha256>  install.sh\" | sha256sum -c - && sh install.sh",
+        "security_test": "CI check that rejects `| sh` patterns.",
+        "regression_test": "Rebuild and confirm the tool installs.",
+        "verification": "Rebuild."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/494.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0020",
+      "fingerprint": "2e2f0cf9b91320a1ccaec9ce69535ff2",
+      "rule_id": "container.host-namespaces",
+      "title": "Host network/PID/IPC namespace shared",
+      "category": "Container Security",
+      "severity": "Medium",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-250",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "deploy/deployment.yaml",
+        "start_line": 15,
+        "end_line": 15
+      },
+      "evidence": {
+        "description": "The container/workload runs with elevated privileges or host access.",
+        "sanitized_code": "hostNetwork: true"
+      },
+      "impact": "A compromise of the container can escalate to the host or cluster.",
+      "exploitability": "Relevant if the workload is deployed with this configuration.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem.",
+        "fixed_code_example": "securityContext:\n  runAsNonRoot: true\n  allowPrivilegeEscalation: false\n  capabilities: { drop: [\"ALL\"] }",
+        "security_test": "Use a policy check (e.g. Kubernetes Pod Security 'restricted' admission, or `docker inspect`) to assert the settings.",
+        "regression_test": "Assert the service still starts and passes health checks as non-root.",
+        "verification": "Deploy to a test cluster/namespace with restricted policy."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0021",
+      "fingerprint": "769a65639f6c8ffd395fcadd49d0a106",
+      "rule_id": "container.runs-as-root-k8s",
+      "title": "Workload configured to run as root",
+      "category": "Container Security",
+      "severity": "Medium",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-250",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "deploy/deployment.yaml",
+        "start_line": 20,
+        "end_line": 20
+      },
+      "evidence": {
+        "description": "The container/workload runs with elevated privileges or host access.",
+        "sanitized_code": "runAsUser: 0"
+      },
+      "impact": "A compromise of the container can escalate to the host or cluster.",
+      "exploitability": "Relevant if the workload is deployed with this configuration.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem.",
+        "fixed_code_example": "securityContext:\n  runAsNonRoot: true\n  allowPrivilegeEscalation: false\n  capabilities: { drop: [\"ALL\"] }",
+        "security_test": "Use a policy check (e.g. Kubernetes Pod Security 'restricted' admission, or `docker inspect`) to assert the settings.",
+        "regression_test": "Assert the service still starts and passes health checks as non-root.",
+        "verification": "Deploy to a test cluster/namespace with restricted policy."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0022",
+      "fingerprint": "fe1b4ddb6702d9a9a7a6df56835ae634",
+      "rule_id": "container.privilege-escalation",
+      "title": "allowPrivilegeEscalation enabled",
+      "category": "Container Security",
+      "severity": "Medium",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-250",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "deploy/deployment.yaml",
+        "start_line": 21,
+        "end_line": 21
+      },
+      "evidence": {
+        "description": "The container/workload runs with elevated privileges or host access.",
+        "sanitized_code": "allowPrivilegeEscalation: true"
+      },
+      "impact": "A compromise of the container can escalate to the host or cluster.",
+      "exploitability": "Relevant if the workload is deployed with this configuration.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem.",
+        "fixed_code_example": "securityContext:\n  runAsNonRoot: true\n  allowPrivilegeEscalation: false\n  capabilities: { drop: [\"ALL\"] }",
+        "security_test": "Use a policy check (e.g. Kubernetes Pod Security 'restricted' admission, or `docker inspect`) to assert the settings.",
+        "regression_test": "Assert the service still starts and passes health checks as non-root.",
+        "verification": "Deploy to a test cluster/namespace with restricted policy."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0023",
+      "fingerprint": "0b083789e5c4c79792665d3b21db6109",
+      "rule_id": "iac.encryption-disabled",
+      "title": "Encryption at rest/in transit disabled",
+      "category": "Infrastructure Exposure",
+      "severity": "Medium",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-311",
+      "owasp_category": "A02:2021-Cryptographic Failures",
+      "location": {
+        "file": "deploy/main.tf",
+        "start_line": 29,
+        "end_line": 29
+      },
+      "evidence": {
+        "description": "Storage or data service is publicly accessible or unencrypted.",
+        "sanitized_code": "storage_encrypted   = false"
+      },
+      "impact": "Data exposure or tampering.",
+      "exploitability": "Relevant for non-public data.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Block public access, enable encryption at rest and in transit, and use least-privilege access policies.",
+        "fixed_code_example": "acl = \"private\"\nblock_public_acls = true",
+        "security_test": "Policy-as-code check in CI.",
+        "regression_test": "Verify the application can still read/write with its role.",
+        "verification": "Run `terraform plan`."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/311.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0024",
+      "fingerprint": "c25dd0a96931154bafd84b283e916be9",
+      "rule_id": "webserver.legacy-tls",
+      "title": "Legacy TLS/SSL protocol enabled",
+      "category": "Insecure Transport",
+      "severity": "Medium",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-326",
+      "owasp_category": "A02:2021-Cryptographic Failures",
+      "location": {
+        "file": "deploy/nginx.conf",
+        "start_line": 4,
+        "end_line": 4
+      },
+      "evidence": {
+        "description": "Legacy TLS/SSL protocol versions or weak ciphers are enabled.",
+        "sanitized_code": "ssl_protocols TLSv1 TLSv1.1 TLSv1.2;"
+      },
+      "impact": "Downgrade and known protocol attacks weaken transport confidentiality.",
+      "exploitability": "Exploitable by network attackers against clients that negotiate the weak version.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Allow only TLS 1.2 and 1.3 with modern cipher suites.",
+        "fixed_code_example": "ssl_protocols TLSv1.2 TLSv1.3;",
+        "security_test": "Run a TLS scanner (e.g. testssl.sh) against a local instance.",
+        "regression_test": "Verify supported clients still connect.",
+        "verification": "Reload the server and rescan."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/326.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0025",
+      "fingerprint": "81f89dedd00773620bc274d88bc15760",
+      "rule_id": "dependencies.wildcard-version",
+      "title": "Wildcard/latest dependency version: cors",
+      "category": "Dependency Security",
+      "severity": "Medium",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-1357",
+      "owasp_category": "A06:2021-Vulnerable and Outdated Components",
+      "location": {
+        "file": "package.json",
+        "start_line": 8,
+        "end_line": 8
+      },
+      "evidence": {
+        "description": "Any future release (including a compromised one) will be installed automatically.",
+        "sanitized_code": "cors *"
+      },
+      "impact": "Builds are not reproducible and may silently pull compromised or breaking images.",
+      "exploitability": "Supply-chain risk; exploitation requires a compromised or changed upstream image.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs.",
+        "fixed_code_example": "FROM python:3.12-slim@sha256:<digest>",
+        "security_test": "Policy check in CI that rejects untagged/latest images.",
+        "regression_test": "Rebuild and run the image test suite.",
+        "verification": "Rebuild the image."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1357.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0026",
+      "fingerprint": "d48669604b9c01b3d90a46d2bcf2e432",
+      "rule_id": "dependencies.untrusted-source",
+      "title": "Dependency installed from VCS/URL: internal-utils",
+      "category": "Dependency Security",
+      "severity": "Medium",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-829",
+      "owasp_category": "A08:2021-Software and Data Integrity Failures",
+      "location": {
+        "file": "package.json",
+        "start_line": 9,
+        "end_line": 9
+      },
+      "evidence": {
+        "description": "Dependency resolved from a git/URL/path source bypasses registry integrity controls and may change without a version bump.",
+        "sanitized_code": "internal-utils git+https://git.example.com/acme/internal-utils.git"
+      },
+      "impact": "A compromised server or MITM yields code execution in the build/runtime environment.",
+      "exploitability": "Exploitable if the remote source or transport is compromised.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Prefer a released registry version pinned with a lockfile/hash; if a VCS source is required, pin to a full commit SHA.",
+        "fixed_code_example": "",
+        "security_test": "",
+        "regression_test": "Rebuild and run the test suite.",
+        "verification": "Confirm the lockfile resolves to an immutable reference."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/829.html"
+      ],
+      "remediation_priority": "P2"
+    },
+    {
+      "id": "SCR-0027",
+      "fingerprint": "7ee36f862d141c1d05d6e33317e0984c",
+      "rule_id": "crypto.insecure-random",
+      "title": "Non-cryptographic PRNG for a security value",
+      "category": "Insecure Randomness",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-338",
+      "owasp_category": "A02:2021-Cryptographic Failures",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 83,
+        "end_line": 83
+      },
+      "evidence": {
+        "description": "A non-cryptographic PRNG appears to generate a security-sensitive value.",
+        "sanitized_code": "reset_token = str(random.randint(100000, 999999))"
+      },
+      "impact": "Predictable tokens, passwords or OTPs can be guessed.",
+      "exploitability": "Relevant when the value is a secret, token, nonce, salt or identifier that must be unguessable.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Use a CSPRNG: secrets.token_urlsafe (Python), crypto.randomBytes / crypto.randomUUID (Node), SecureRandom (Java), RandomNumberGenerator (.NET).",
+        "fixed_code_example": "token = secrets.token_urlsafe(32)",
+        "security_test": "Assert the token generator is backed by the CSPRNG (mock/inspect).",
+        "regression_test": "Assert token length/format is unchanged.",
+        "verification": "Run tests."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/338.html"
+      ],
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0028",
+      "fingerprint": "eae015eaca329ceb5c7582f4d8d6e757",
+      "rule_id": "config.debug-enabled",
+      "title": "Debug mode enabled",
+      "category": "Security Misconfiguration",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-489",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 93,
+        "end_line": 93
+      },
+      "evidence": {
+        "description": "Debug mode or developer error pages are enabled.",
+        "sanitized_code": "app.run(host=\"0.0.0.0\", debug=True)"
+      },
+      "impact": "Debug consoles and stack traces disclose internals and may allow code execution (e.g. Werkzeug debugger).",
+      "exploitability": "Relevant if this configuration reaches a deployed environment.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Drive debug flags from environment configuration and default to off in production.",
+        "fixed_code_example": "app.run(debug=os.environ.get('FLASK_DEBUG') == '1')",
+        "security_test": "Assert production configuration loads with debug disabled.",
+        "regression_test": "Assert the app still starts in development mode when explicitly enabled.",
+        "verification": "Check deployment configuration."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/489.html"
+      ],
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0029",
+      "fingerprint": "e9edda555dbe95603a0a12f15642b434",
+      "rule_id": "config.cors-wildcard",
+      "title": "CORS allows any origin",
+      "category": "Security Misconfiguration",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-942",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "app/server.js",
+        "start_line": 9,
+        "end_line": 9
+      },
+      "evidence": {
+        "description": "CORS allows any origin.",
+        "sanitized_code": "app.use(cors({ origin: \"*\", credentials: true }));"
+      },
+      "impact": "With credentials, any website could read authenticated responses.",
+      "exploitability": "Severe only when credentials (cookies) are allowed or the API serves non-public data.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Allow-list trusted origins; never combine wildcard/reflected origins with credentials.",
+        "fixed_code_example": "CORS(app, origins=[\"https://app.example.com\"], supports_credentials=True)",
+        "security_test": "Send a request with Origin: https://evil.test and assert no ACAO header for it.",
+        "regression_test": "Assert trusted origins still receive CORS headers.",
+        "verification": "Run tests."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "credentials are also enabled in this file"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/942.html"
+      ],
+      "owasp_api_category": "API8:2023-Security Misconfiguration",
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0030",
+      "fingerprint": "ad62681bc7717f8b4efa3f73f7fb0804",
+      "rule_id": "mass-assignment.request-body-binding",
+      "title": "Model bound directly to request body",
+      "category": "Mass Assignment",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-915",
+      "owasp_category": "A08:2021-Software and Data Integrity Failures",
+      "location": {
+        "file": "app/server.js",
+        "start_line": 22,
+        "end_line": 22
+      },
+      "evidence": {
+        "description": "A model/object is created or updated directly from the request body.",
+        "sanitized_code": "Object.assign(user, req.body);"
+      },
+      "impact": "Attackers may set fields they should not control (e.g. is_admin, owner_id, balance).",
+      "exploitability": "Exploitable when the model has sensitive attributes and no allow-list/DTO restricts fields.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Map input through an explicit allow-list or DTO/schema; never bind the raw body to persistence models.",
+        "fixed_code_example": "data = UserUpdateSchema().load(request.json)  # only whitelisted fields\nuser.name = data['name']",
+        "security_test": "Send `{\"is_admin\": true}` to the endpoint locally and assert the flag is not persisted.",
+        "regression_test": "Assert allowed fields are still updated.",
+        "verification": "Run tests; review the model for privileged attributes."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/915.html"
+      ],
+      "owasp_api_category": "API3:2023-Broken Object Property Level Authorization",
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0031",
+      "fingerprint": "464e348a776c0c04b7bad2de93a7f03b",
+      "rule_id": "auth.jwt.decode-without-verify-node",
+      "title": "jsonwebtoken decode() does not verify signatures",
+      "category": "Broken Authentication (JWT)",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "status": "Needs Manual Review",
+      "cwe": "CWE-347",
+      "owasp_category": "A07:2021-Identification and Authentication Failures",
+      "location": {
+        "file": "app/server.js",
+        "start_line": 28,
+        "end_line": 28
+      },
+      "evidence": {
+        "description": "JWT validation is weakened (signature, algorithm or claim checks disabled).",
+        "sanitized_code": "const claims = jwt.decode(req.headers.authorization);"
+      },
+      "impact": "Attackers may forge or replay tokens, impersonating users or escalating privileges.",
+      "exploitability": "Exploitable when the token is used for authentication/authorization decisions.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Always verify the signature with an explicit algorithm allow-list, and validate exp, nbf, iss and aud.",
+        "fixed_code_example": "jwt.decode(token, key, algorithms=[\"RS256\"], audience=AUD, issuer=ISS)",
+        "security_test": "Present a token signed with a different key and an `alg: none` token; assert both are rejected (401).",
+        "regression_test": "Assert valid tokens are still accepted and expired tokens are rejected.",
+        "verification": "Run tests covering signature, expiry, issuer and audience."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/347.html"
+      ],
+      "owasp_api_category": "API2:2023-Broken Authentication",
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0032",
+      "fingerprint": "538c7200b015bfc27a09333889172c6b",
+      "rule_id": "errors.stack-trace-in-response",
+      "title": "Exception details returned to the client",
+      "category": "Insecure Error Handling",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-209",
+      "owasp_category": "A04:2021-Insecure Design",
+      "location": {
+        "file": "app/server.js",
+        "start_line": 33,
+        "end_line": 33
+      },
+      "evidence": {
+        "description": "Exception details or stack traces are returned to the client.",
+        "sanitized_code": "res.status(500).send(err.stack);"
+      },
+      "impact": "Internal paths, queries, versions or secrets may be disclosed and aid further attacks.",
+      "exploitability": "Relevant for responses reachable by untrusted users.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Return generic error messages with a correlation id and log details server-side.",
+        "fixed_code_example": "log.exception(\"failed\"); return jsonify(error=\"internal error\", id=req_id), 500",
+        "security_test": "Trigger the error path and assert the body contains no stack trace.",
+        "regression_test": "Assert error responses keep the expected status code.",
+        "verification": "Run tests."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": [
+          "stack trace exposed"
+        ]
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/209.html"
+      ],
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0033",
+      "fingerprint": "4ad3276515c0f6687082460b6ac3ced4",
+      "rule_id": "iac.network.open-to-world",
+      "title": "Ingress open to 0.0.0.0/0",
+      "category": "Infrastructure Exposure",
+      "severity": "Medium",
+      "confidence": "Medium",
+      "status": "Probable",
+      "cwe": "CWE-284",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "deploy/main.tf",
+        "start_line": 8,
+        "end_line": 8
+      },
+      "evidence": {
+        "description": "A resource is exposed to the internet or allows unrestricted network access.",
+        "sanitized_code": "cidr_blocks = [\"0.0.0.0/0\"]"
+      },
+      "impact": "Services become reachable by any attacker on the internet.",
+      "exploitability": "Relevant if the exposed port/service is not intended to be public.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Restrict CIDR ranges to known networks, place services behind load balancers/WAF and use private subnets.",
+        "fixed_code_example": "cidr_blocks = [var.office_cidr]",
+        "security_test": "Run a policy check (e.g. checkov, tfsec/trivy config) in CI.",
+        "regression_test": "Verify legitimate clients still connect from allowed ranges.",
+        "verification": "Run `terraform plan` and review the security group diff."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/284.html"
+      ],
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0034",
+      "fingerprint": "1b5b01ca2f65f0b11daebf5a9c31e001",
+      "rule_id": "container.docker.unpinned-base-image",
+      "title": "Base image not pinned (latest or no tag)",
+      "category": "Supply Chain",
+      "severity": "Low",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-1357",
+      "owasp_category": "A08:2021-Software and Data Integrity Failures",
+      "location": {
+        "file": "Dockerfile",
+        "start_line": 1,
+        "end_line": 1
+      },
+      "evidence": {
+        "description": "The base image is not pinned to a specific version/digest.",
+        "sanitized_code": "FROM python:latest"
+      },
+      "impact": "Builds are not reproducible and may silently pull compromised or breaking images.",
+      "exploitability": "Supply-chain risk; exploitation requires a compromised or changed upstream image.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs.",
+        "fixed_code_example": "FROM python:3.12-slim@sha256:<digest>",
+        "security_test": "Policy check in CI that rejects untagged/latest images.",
+        "regression_test": "Rebuild and run the image test suite.",
+        "verification": "Rebuild the image."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1357.html"
+      ],
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0035",
+      "fingerprint": "bb72a9729ff2771ecf736f2fa2a04da4",
+      "rule_id": "webserver.directory-listing",
+      "title": "Directory listing enabled",
+      "category": "Sensitive Information Disclosure",
+      "severity": "Low",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-548",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "deploy/nginx.conf",
+        "start_line": 5,
+        "end_line": 5
+      },
+      "evidence": {
+        "description": "Web server configuration discloses information (directory listing, version banners).",
+        "sanitized_code": "autoindex on;"
+      },
+      "impact": "Helps attackers enumerate files and fingerprint versions.",
+      "exploitability": "Relevant for internet-facing servers.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Disable directory listing and version banners.",
+        "fixed_code_example": "autoindex off;\nserver_tokens off;",
+        "security_test": "Request a directory without index locally and assert 403/404.",
+        "regression_test": "Verify normal pages are still served.",
+        "verification": "Reload and test."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/548.html"
+      ],
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0036",
+      "fingerprint": "83dce82fb0220dd4ae167239e1d1c195",
+      "rule_id": "dependencies.not-pinned",
+      "title": "1 dependencies without an exact pinned version",
+      "category": "Dependency Security",
+      "severity": "Low",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-1357",
+      "owasp_category": "A06:2021-Vulnerable and Outdated Components",
+      "location": {
+        "file": "package.json",
+        "start_line": 6,
+        "end_line": 6
+      },
+      "evidence": {
+        "description": "Version ranges without a lockfile make builds non-reproducible and prevent accurate vulnerability verification.",
+        "sanitized_code": "express"
+      },
+      "impact": "Builds are not reproducible and may silently pull compromised or breaking images.",
+      "exploitability": "Supply-chain risk; exploitation requires a compromised or changed upstream image.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs.",
+        "fixed_code_example": "FROM python:3.12-slim@sha256:<digest>",
+        "security_test": "Policy check in CI that rejects untagged/latest images.",
+        "regression_test": "Rebuild and run the image test suite.",
+        "verification": "Rebuild the image."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1357.html"
+      ],
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0037",
+      "fingerprint": "8c3a7a5ebfa14512ad07422fa58b47e2",
+      "rule_id": "dependencies.not-pinned",
+      "title": "2 dependencies without an exact pinned version",
+      "category": "Dependency Security",
+      "severity": "Low",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-1357",
+      "owasp_category": "A06:2021-Vulnerable and Outdated Components",
+      "location": {
+        "file": "requirements.txt",
+        "start_line": 2,
+        "end_line": 3
+      },
+      "evidence": {
+        "description": "Version ranges without a lockfile make builds non-reproducible and prevent accurate vulnerability verification.",
+        "sanitized_code": "PyYAML, requests"
+      },
+      "impact": "Builds are not reproducible and may silently pull compromised or breaking images.",
+      "exploitability": "Supply-chain risk; exploitation requires a compromised or changed upstream image.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs.",
+        "fixed_code_example": "FROM python:3.12-slim@sha256:<digest>",
+        "security_test": "Policy check in CI that rejects untagged/latest images.",
+        "regression_test": "Rebuild and run the image test suite.",
+        "verification": "Rebuild the image."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1357.html"
+      ],
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0038",
+      "fingerprint": "a6bc5be53b47b7e1aad801db95a0321f",
+      "rule_id": "cicd.gha.missing-permissions",
+      "title": "Workflow without explicit permissions block",
+      "category": "CI/CD Security",
+      "severity": "Low",
+      "confidence": "Medium",
+      "status": "Needs Manual Review",
+      "cwe": "CWE-250",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": ".github/workflows/triage.yml",
+        "start_line": 3,
+        "end_line": 3
+      },
+      "evidence": {
+        "description": "CI/CD workflow configuration allows untrusted input or excessive privileges.",
+        "sanitized_code": "on:"
+      },
+      "impact": "Attackers may execute code in CI, steal secrets or push malicious artifacts.",
+      "exploitability": "Exploitable via pull requests, issues or comments from untrusted users, depending on triggers.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Use least-privilege `permissions:`, never interpolate untrusted event fields into `run:` (use env vars), avoid checking out PR code in pull_request_target, and pin actions to full commit SHAs.",
+        "fixed_code_example": "env:\n  TITLE: ${{ github.event.pull_request.title }}\nrun: echo \"$TITLE\"",
+        "security_test": "Review with actionlint/zizmor or equivalent workflow linters.",
+        "regression_test": "Run the workflow on a test PR.",
+        "verification": "Check the workflow run logs and permissions summary."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0039",
+      "fingerprint": "b071eb242292326078e01c2beebfc050",
+      "rule_id": "container.docker.no-user",
+      "title": "Dockerfile has no USER instruction (defaults to root)",
+      "category": "Container Security",
+      "severity": "Low",
+      "confidence": "Medium",
+      "status": "Needs Manual Review",
+      "cwe": "CWE-250",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "Dockerfile",
+        "start_line": 1,
+        "end_line": 1
+      },
+      "evidence": {
+        "description": "The container/workload runs with elevated privileges or host access.",
+        "sanitized_code": "FROM python:latest"
+      },
+      "impact": "A compromise of the container can escalate to the host or cluster.",
+      "exploitability": "Relevant if the workload is deployed with this configuration.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Run as a non-root user, drop all capabilities, forbid privilege escalation, avoid host namespaces and the Docker socket, and enable a read-only root filesystem.",
+        "fixed_code_example": "securityContext:\n  runAsNonRoot: true\n  allowPrivilegeEscalation: false\n  capabilities: { drop: [\"ALL\"] }",
+        "security_test": "Use a policy check (e.g. Kubernetes Pod Security 'restricted' admission, or `docker inspect`) to assert the settings.",
+        "regression_test": "Assert the service still starts and passes health checks as non-root.",
+        "verification": "Deploy to a test cluster/namespace with restricted policy."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/250.html"
+      ],
+      "remediation_priority": "P3"
+    },
+    {
+      "id": "SCR-0040",
+      "fingerprint": "05dc55ff3af0be64b546b26c4c2db264",
+      "rule_id": "crypto.weak-hash",
+      "title": "Weak hash algorithm (MD5/SHA-1)",
+      "category": "Insecure Cryptography",
+      "severity": "Low",
+      "confidence": "Low",
+      "status": "False Positive",
+      "cwe": "CWE-328",
+      "owasp_category": "A02:2021-Cryptographic Failures",
+      "location": {
+        "file": "app/app.py",
+        "start_line": 89,
+        "end_line": 89
+      },
+      "evidence": {
+        "description": "A weak hash algorithm (MD5/SHA-1) is used.",
+        "sanitized_code": "return hashlib.md5(payload).hexdigest()"
+      },
+      "impact": "If used for passwords, signatures or integrity, collisions or fast brute force undermine the control.",
+      "exploitability": "Only a vulnerability when the hash protects a security property; checksums/cache keys are usually acceptable.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "For passwords use Argon2id, scrypt or bcrypt with per-user salt; for integrity use SHA-256+ or HMAC.",
+        "fixed_code_example": "from argon2 import PasswordHasher\nhash = PasswordHasher().hash(password)",
+        "security_test": "Assert stored password hashes use the new algorithm prefix (e.g. $argon2id$).",
+        "regression_test": "Assert login still works, including a migration path for legacy hashes.",
+        "verification": "Run tests; confirm the purpose of each MD5/SHA-1 usage."
+      },
+      "effort": "Medium",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/328.html"
+      ],
+      "remediation_priority": "P4",
+      "triage": {
+        "original_severity": "Low",
+        "original_status": "Needs Manual Review",
+        "original_confidence": "Low",
+        "justification": "MD5 is used only to build a non-secret cache key (cache_key); no security property depends on collision resistance.",
+        "reviewer": "example-reviewer"
+      }
+    },
+    {
+      "id": "SCR-0041",
+      "fingerprint": "cb1aca0c843b2c8b8af636cb45463695",
+      "rule_id": "cicd.gha.unpinned-action",
+      "title": "Third-party action not pinned to a commit SHA",
+      "category": "Supply Chain",
+      "severity": "Informational",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-829",
+      "owasp_category": "A08:2021-Software and Data Integrity Failures",
+      "location": {
+        "file": ".github/workflows/triage.yml",
+        "start_line": 10,
+        "end_line": 10
+      },
+      "evidence": {
+        "description": "CI/CD workflow configuration allows untrusted input or excessive privileges.",
+        "sanitized_code": "- uses: actions/checkout@v4"
+      },
+      "impact": "Attackers may execute code in CI, steal secrets or push malicious artifacts.",
+      "exploitability": "Exploitable via pull requests, issues or comments from untrusted users, depending on triggers.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Use least-privilege `permissions:`, never interpolate untrusted event fields into `run:` (use env vars), avoid checking out PR code in pull_request_target, and pin actions to full commit SHAs.",
+        "fixed_code_example": "env:\n  TITLE: ${{ github.event.pull_request.title }}\nrun: echo \"$TITLE\"",
+        "security_test": "Review with actionlint/zizmor or equivalent workflow linters.",
+        "regression_test": "Run the workflow on a test PR.",
+        "verification": "Check the workflow run logs and permissions summary."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/829.html"
+      ],
+      "remediation_priority": "P4"
+    },
+    {
+      "id": "SCR-0042",
+      "fingerprint": "2c3c28fc8d300e80f0591d0f3a856f79",
+      "rule_id": "webserver.version-disclosure",
+      "title": "Server version banner enabled",
+      "category": "Sensitive Information Disclosure",
+      "severity": "Informational",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-200",
+      "owasp_category": "A05:2021-Security Misconfiguration",
+      "location": {
+        "file": "deploy/nginx.conf",
+        "start_line": 6,
+        "end_line": 6
+      },
+      "evidence": {
+        "description": "Web server configuration discloses information (directory listing, version banners).",
+        "sanitized_code": "server_tokens on;"
+      },
+      "impact": "Helps attackers enumerate files and fingerprint versions.",
+      "exploitability": "Relevant for internet-facing servers.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Disable directory listing and version banners.",
+        "fixed_code_example": "autoindex off;\nserver_tokens off;",
+        "security_test": "Request a directory without index locally and assert 403/404.",
+        "regression_test": "Verify normal pages are still served.",
+        "verification": "Reload and test."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/200.html"
+      ],
+      "remediation_priority": "P4"
+    },
+    {
+      "id": "SCR-0043",
+      "fingerprint": "b288151f9d0e70a4a4d81259c452ad4a",
+      "rule_id": "dependencies.missing-lockfile",
+      "title": "npm project without a lockfile",
+      "category": "Dependency Security",
+      "severity": "Informational",
+      "confidence": "High",
+      "status": "Probable",
+      "cwe": "CWE-1357",
+      "owasp_category": "A06:2021-Vulnerable and Outdated Components",
+      "location": {
+        "file": "package.json",
+        "start_line": 1,
+        "end_line": 1
+      },
+      "evidence": {
+        "description": "Without a lockfile, installed versions vary between builds.",
+        "sanitized_code": "package.json (no package-lock.json/yarn.lock/pnpm-lock.yaml)"
+      },
+      "impact": "Builds are not reproducible and may silently pull compromised or breaking images.",
+      "exploitability": "Supply-chain risk; exploitation requires a compromised or changed upstream image.",
+      "business_impact": "Not assessed by the scanner; evaluate against the affected asset and data classification.",
+      "remediation": {
+        "recommendation": "Pin images to a version tag and preferably a digest (image@sha256:...), and update via automated PRs.",
+        "fixed_code_example": "FROM python:3.12-slim@sha256:<digest>",
+        "security_test": "Policy check in CI that rejects untagged/latest images.",
+        "regression_test": "Rebuild and run the image test suite.",
+        "verification": "Rebuild the image."
+      },
+      "effort": "Low",
+      "source": "scanner",
+      "verification": {
+        "method": "heuristic",
+        "tool": "scanner",
+        "reproduced": false,
+        "notes": []
+      },
+      "cvss": null,
+      "references": [
+        "https://cwe.mitre.org/data/definitions/1357.html"
+      ],
+      "remediation_priority": "P4"
+    }
+  ],
+  "summary": {
+    "total": 43,
+    "active": 42,
+    "by_severity": {
+      "Critical": 0,
+      "High": 18,
+      "Medium": 15,
+      "Low": 7,
+      "Informational": 3
+    },
+    "by_status": {
+      "Confirmed": 1,
+      "Probable": 38,
+      "Needs Manual Review": 3,
+      "False Positive": 1,
+      "Not Verified": 0
+    },
+    "by_priority": {
+      "P1": 13,
+      "P2": 13,
+      "P3": 13,
+      "P4": 4
+    }
+  }
+}

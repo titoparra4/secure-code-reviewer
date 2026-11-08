@@ -1,0 +1,39 @@
+{
+  "coverage": [
+    {
+      "category": "Broken Access Control / IDOR / authorization policies (RBAC/ABAC)",
+      "status": "reviewed",
+      "method": "manual",
+      "notes": "Agent read every route handler in app/app.py and app/server.js and checked object ownership and role checks."
+    }
+  ],
+  "findings": [
+    {
+      "title": "Insecure Direct Object Reference on invoice retrieval",
+      "category": "Broken Access Control",
+      "severity": "High",
+      "confidence": "High",
+      "status": "Confirmed",
+      "cwe": "CWE-639",
+      "owasp_category": "A01:2021-Broken Access Control",
+      "owasp_api_category": "API1:2023-Broken Object Level Authorization",
+      "location": {"file": "app/app.py", "start_line": 41, "end_line": 46},
+      "evidence": {
+        "description": "The handler loads an invoice by the path parameter invoice_id and returns it without checking that the invoice belongs to the authenticated user. No authorization decorator or ownership filter exists on this route or in a before_request hook (reviewed app/app.py in full).",
+        "sanitized_code": "cur.execute(\"SELECT * FROM invoices WHERE id = ?\", (invoice_id,))\nreturn jsonify(cur.fetchone())"
+      },
+      "impact": "Any user who can reach the endpoint can enumerate invoice ids and read other customers' invoices (personal and financial data).",
+      "exploitability": "Trivial when invoice ids are sequential; requires only network access to the endpoint.",
+      "business_impact": "Exposure of customer financial data; likely reportable privacy incident.",
+      "remediation": {
+        "recommendation": "Scope the query to the current user (WHERE id = ? AND owner_id = ?) and return 404 when the invoice is not owned by the caller. Centralize the check in a reusable authorization helper.",
+        "fixed_code_example": "cur.execute(\"SELECT * FROM invoices WHERE id = ? AND owner_id = ?\", (invoice_id, current_user.id))\nrow = cur.fetchone()\nif row is None:\n    abort(404)",
+        "security_test": "With two local test users A and B, request B's invoice id as A and assert 404 and no invoice data in the body.",
+        "regression_test": "Assert that A can still read A's own invoice (200, same payload as before).",
+        "verification": "Run both tests; review the other object-returning routes for the same pattern."
+      },
+      "effort": "Low",
+      "verification": {"method": "manual", "tool": "agent", "reproduced": false, "notes": ["confirmed by code reading; no dynamic test executed"]}
+    }
+  ]
+}

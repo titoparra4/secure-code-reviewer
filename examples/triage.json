@@ -1,0 +1,12 @@
+{
+  "triage": [
+    {
+      "rule_id": "crypto.weak-hash",
+      "file": "app/app.py",
+      "line": 89,
+      "status": "False Positive",
+      "justification": "MD5 is used only to build a non-secret cache key (cache_key); no security property depends on collision resistance.",
+      "reviewer": "example-reviewer"
+    }
+  ]
+}

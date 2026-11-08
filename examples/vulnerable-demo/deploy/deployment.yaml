@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shop
+  template:
+    metadata:
+      labels:
+        app: shop
+    spec:
+      hostNetwork: true
+      containers:
+        - name: shop
+          image: registry.example.com/shop:1.0.0
+          securityContext:
+            runAsUser: 0
+            allowPrivilegeEscalation: true
+            capabilities:
+              add:
+                - SYS_ADMIN

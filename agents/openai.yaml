@@ -1,0 +1,6 @@
+# Optional UI metadata for OpenAI Codex skill listings. The skill itself is defined by SKILL.md;
+# environments that do not read this file ignore it.
+interface:
+  display_name: "Secure Code Reviewer"
+  short_description: "Evidence-based security review of code, secrets, dependencies, APIs and IaC"
+  default_prompt: "Review this repository for security vulnerabilities and produce a prioritized report with fixes and regression tests."

@@ -1,0 +1,91 @@
+# Example workflow for YOUR repository (copy to .github/workflows/secure-code-review.yml).
+# Deterministic, offline by default, least-privilege. Report-only unless you set FAIL_ON.
+# Replace version tags with full commit SHAs that you have verified (recommended).
+name: secure-code-review
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  SCR_REF: v1.0.0          # release of secure-code-reviewer to use
+  FAIL_ON: none            # none | critical | high | medium | low
+  BLOCK_STATUSES: Confirmed,Probable
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # only needed for the SARIF upload step
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/checkout@v4
+        with:
+          repository: titoparra4/secure-code-reviewer
+          ref: ${{ env.SCR_REF }}
+          path: .scr-tool
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Determine scope
+        id: scope
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --name-only --diff-filter=ACMR "origin/${BASE_REF}...HEAD" > "$RUNNER_TEMP/changed.txt"
+            echo "args=--mode pr --changed-files-from $RUNNER_TEMP/changed.txt" >> "$GITHUB_OUTPUT"
+          else
+            echo "args=--mode full" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Scan (offline)
+        run: |
+          python .scr-tool/scripts/scan_repository.py . ${{ steps.scope.outputs.args }} \
+            --exclude '.scr-tool/*' -o "$RUNNER_TEMP/scr-raw.json"
+
+      - name: Normalize (baseline and triage are optional)
+        run: |
+          ARGS=""
+          [ -f .security/baseline.json ] && ARGS="$ARGS --baseline .security/baseline.json"
+          [ -f .security/triage.json ] && ARGS="$ARGS --triage .security/triage.json"
+          python .scr-tool/scripts/normalize_findings.py "$RUNNER_TEMP/scr-raw.json" $ARGS -o "$RUNNER_TEMP/scr-report.json"
+
+      - name: Render reports
+        run: |
+          python .scr-tool/scripts/generate_report.py "$RUNNER_TEMP/scr-report.json" -f sarif -o "$RUNNER_TEMP/scr-report.sarif"
+          python .scr-tool/scripts/generate_report.py "$RUNNER_TEMP/scr-report.json" -f markdown -o "$RUNNER_TEMP/scr-report.md"
+
+      - name: Upload SARIF to code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ runner.temp }}/scr-report.sarif
+          category: secure-code-reviewer
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: secure-code-review
+          path: |
+            ${{ runner.temp }}/scr-report.json
+            ${{ runner.temp }}/scr-report.md
+          retention-days: 14
+
+      - name: Gate
+        run: |
+          ONLY_NEW=""
+          [ -f .security/baseline.json ] && ONLY_NEW="--only-new"
+          python .scr-tool/scripts/ci_gate.py --report "$RUNNER_TEMP/scr-report.json" \
+            --fail-on "$FAIL_ON" --statuses "$BLOCK_STATUSES" $ONLY_NEW

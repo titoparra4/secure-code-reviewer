@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/titoparra4/secure-code-reviewer/schemas/findings.schema.json",
+  "title": "Secure Code Reviewer findings document",
+  "description": "Output of scan_repository.py (stage 'scan') and normalize_findings.py (stage 'normalized'). Version 1.0.0.",
+  "type": "object",
+  "required": ["schema_version", "tool", "generated_at", "stage", "scan", "coverage", "pending_verifications", "tool_errors", "dependencies", "findings", "summary"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "tool": {
+      "type": "object",
+      "required": ["name", "version", "component"],
+      "properties": {
+        "name": {"const": "secure-code-reviewer"},
+        "version": {"type": "string"},
+        "component": {"enum": ["scan_repository", "normalize_findings"]}
+      }
+    },
+    "generated_at": {"type": "string", "format": "date-time"},
+    "stage": {"enum": ["scan", "normalized"]},
+    "scan": {
+      "type": "object",
+      "required": ["target", "mode", "files_scanned", "files_skipped"],
+      "properties": {
+        "target": {"type": "string"},
+        "mode": {"enum": ["quick", "full", "pr", "api", "secrets", "dependencies", "config", "mixed"]},
+        "files_scanned": {"type": "integer", "minimum": 0},
+        "files_skipped": {"type": "integer", "minimum": 0},
+        "files_skipped_by_reason": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "changed_files_only": {"type": "boolean"},
+        "limits": {"type": "object"},
+        "network": {"type": "object"},
+        "rules_evaluated": {"type": "integer"},
+        "merged_inputs": {"type": "integer"}
+      }
+    },
+    "inventory": {
+      "type": "object",
+      "properties": {
+        "languages": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "frameworks": {"type": "array", "items": {"type": "string"}},
+        "auth_mechanisms": {"type": "array", "items": {"type": "string"}},
+        "entry_points": {"type": "array", "items": {"type": "string"}},
+        "route_handlers_detected": {"type": "integer"},
+        "config_files": {"type": "array", "items": {"type": "string"}},
+        "manifests": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "status"],
+        "properties": {
+          "category": {"type": "string"},
+          "status": {"enum": ["reviewed", "partial", "not_reviewed"]},
+          "method": {"type": "string"},
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "pending_verifications": {"type": "array", "items": {"type": "string"}},
+    "tool_errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tool", "message"],
+        "properties": {"tool": {"type": "string"}, "message": {"type": "string"}}
+      }
+    },
+    "dependencies": {"type": "array", "items": {"$ref": "#/$defs/dependency"}},
+    "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
+    "summary": {
+      "type": "object",
+      "required": ["total", "active", "by_severity", "by_status", "by_priority"],
+      "properties": {
+        "total": {"type": "integer", "minimum": 0},
+        "active": {"type": "integer", "minimum": 0},
+        "by_severity": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "by_status": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "by_priority": {"type": "object", "additionalProperties": {"type": "integer"}}
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "required": ["compared", "new", "existing", "resolved_ids"],
+      "properties": {
+        "compared": {"type": "boolean"},
+        "new": {"type": "integer"},
+        "existing": {"type": "integer"},
+        "resolved_ids": {"type": "array", "items": {"$ref": "#/$defs/id"}}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^SCR-[0-9]{4,}$"},
+    "severity": {"enum": ["Critical", "High", "Medium", "Low", "Informational"]},
+    "confidence": {"enum": ["High", "Medium", "Low"]},
+    "status": {"enum": ["Confirmed", "Probable", "Needs Manual Review", "False Positive", "Not Verified"]},
+    "relpath": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?![A-Za-z]:)(?!.*(^|/)\\.\\.(/|$)).+$"},
+    "dependency": {
+      "type": "object",
+      "required": ["name", "ecosystem", "manifest", "pinned", "vulnerability_status"],
+      "properties": {
+        "name": {"type": "string"},
+        "spec": {"type": "string"},
+        "version": {"type": ["string", "null"]},
+        "ecosystem": {"enum": ["PyPI", "npm", "Go", "crates.io", "Maven", "NuGet"]},
+        "manifest": {"$ref": "#/$defs/relpath"},
+        "line": {"type": "integer", "minimum": 1},
+        "source": {"enum": ["registry", "url"]},
+        "pinned": {"type": "boolean"},
+        "vulnerability_status": {"enum": ["Not Verified", "No Known Vulnerabilities", "Vulnerable"]},
+        "verification_note": {"type": "string"},
+        "advisories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id"],
+            "properties": {
+              "id": {"type": "string"},
+              "summary": {"type": "string"},
+              "aliases": {"type": "array", "items": {"type": "string"}},
+              "severity": {"$ref": "#/$defs/severity"},
+              "fixed_versions": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "fingerprint", "rule_id", "title", "category", "severity", "confidence", "status", "cwe", "owasp_category", "location", "evidence", "impact", "remediation", "source", "remediation_priority"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "fingerprint": {"type": "string", "pattern": "^[0-9a-f]{16,64}$", "description": "Line-number independent hash of rule, file and normalized (redacted) evidence."},
+        "rule_id": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "category": {"type": "string", "minLength": 1},
+        "severity": {"$ref": "#/$defs/severity"},
+        "confidence": {"$ref": "#/$defs/confidence"},
+        "status": {"$ref": "#/$defs/status"},
+        "cwe": {"type": "string", "pattern": "^CWE-[0-9]+$"},
+        "owasp_category": {"type": "string", "minLength": 1},
+        "owasp_api_category": {"type": "string"},
+        "location": {
+          "type": "object",
+          "required": ["file", "start_line", "end_line"],
+          "properties": {
+            "file": {"$ref": "#/$defs/relpath"},
+            "start_line": {"type": "integer", "minimum": 1},
+            "end_line": {"type": "integer", "minimum": 1}
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "required": ["description", "sanitized_code"],
+          "properties": {
+            "description": {"type": "string"},
+            "sanitized_code": {"type": "string", "description": "Code excerpt with secrets replaced by [REDACTED:kind:len=N]."}
+          }
+        },
+        "impact": {"type": "string", "minLength": 1},
+        "exploitability": {"type": "string"},
+        "business_impact": {"type": "string"},
+        "remediation": {
+          "type": "object",
+          "required": ["recommendation", "verification"],
+          "properties": {
+            "recommendation": {"type": "string"},
+            "fixed_code_example": {"type": "string"},
+            "security_test": {"type": "string"},
+            "regression_test": {"type": "string"},
+            "verification": {"type": "string"}
+          }
+        },
+        "effort": {"enum": ["Low", "Medium", "High"]},
+        "remediation_priority": {"enum": ["P1", "P2", "P3", "P4"]},
+        "source": {"enum": ["scanner", "semgrep", "gitleaks", "trivy", "osv", "agent", "manual"]},
+        "sources": {"type": "array", "items": {"type": "string"}},
+        "verification": {
+          "type": "object",
+          "properties": {
+            "method": {"enum": ["heuristic", "external_tool", "advisory_database", "manual"]},
+            "tool": {"type": "string"},
+            "reproduced": {"type": "boolean"},
+            "notes": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "cvss": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "required": ["version", "vector"],
+              "properties": {
+                "version": {"const": "4.0"},
+                "vector": {"type": "string", "pattern": "^CVSS:4\\.0/"},
+                "score": {"type": ["number", "null"], "minimum": 0, "maximum": 10},
+                "rationale": {"type": "string"}
+              }
+            }
+          ]
+        },
+        "references": {"type": "array", "items": {"type": "string"}},
+        "related_rules": {"type": "array", "items": {"type": "string"}},
+        "merged_fingerprints": {"type": "array", "items": {"type": "string"}},
+        "baseline_status": {"enum": ["new", "existing"]},
+        "triage": {
+          "type": "object",
+          "required": ["original_severity", "original_status", "justification"],
+          "properties": {
+            "original_severity": {"$ref": "#/$defs/severity"},
+            "original_status": {"$ref": "#/$defs/status"},
+            "original_confidence": {"$ref": "#/$defs/confidence"},
+            "justification": {"type": "string", "minLength": 10},
+            "reviewer": {"type": "string"}
+          }
+        }
+      }
+    }
+  }
+}

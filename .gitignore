@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+*.egg-info/
+dist/
+build/
+.DS_Store
+# local scan outputs
+scr-*.json
+scr-*.md
+scr-*.sarif

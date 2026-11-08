@@ -1,0 +1,11 @@
+{
+  "name": "vulnerable-demo",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "express": "^4.17.1",
+    "jsonwebtoken": "8.5.1",
+    "cors": "*",
+    "internal-utils": "git+https://git.example.com/acme/internal-utils.git"
+  }
+}

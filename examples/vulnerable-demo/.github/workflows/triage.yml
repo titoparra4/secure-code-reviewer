@@ -1,0 +1,12 @@
+# Demo workflow (not executed: GitHub only runs workflows in the repository root .github/).
+name: Issue triage
+on:
+  issues:
+    types: [opened]
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Echo title
+        run: echo "New issue: ${{ github.event.issue.title }}"
