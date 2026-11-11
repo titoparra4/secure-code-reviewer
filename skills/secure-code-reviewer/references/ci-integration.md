@@ -22,7 +22,7 @@ Use the deterministic model to gate merges and the agent-assisted model for advi
 
 ## 2. Deterministic pipeline
 
-A ready-to-copy workflow is in `examples/ci/secure-code-review.yml`. Steps:
+A ready-to-copy workflow is in the project repository: [examples/ci/secure-code-review.yml](https://github.com/titoparra4/secure-code-reviewer/blob/main/examples/ci/secure-code-review.yml). Steps:
 
 1. Checkout with `persist-credentials: false`.
 2. Compute changed files for PRs: `git diff --name-only --diff-filter=ACMR origin/<base>...HEAD`.

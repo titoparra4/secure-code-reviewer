@@ -10,13 +10,14 @@ from typing import Any, Dict, List
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-SCRIPTS = ROOT / "scripts"
+SKILL = ROOT / "skills" / "secure-code-reviewer"  # the installable skill package
+SCRIPTS = SKILL / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 import scan_repository  # noqa: E402
 import scr_common  # noqa: E402
 
-SCHEMA = json.loads((ROOT / "schemas" / "findings.schema.json").read_text(encoding="utf-8"))
+SCHEMA = json.loads((SKILL / "schemas" / "findings.schema.json").read_text(encoding="utf-8"))
 
 
 def fake_secret(kind: str) -> str:

@@ -11,7 +11,7 @@ from argparse import Namespace
 
 import pytest
 
-from conftest import ROOT, run_scan
+from conftest import ROOT, SKILL, run_scan
 
 import normalize_findings as N
 import scr_common as C
@@ -38,7 +38,7 @@ def test_scan_output_matches_json_schema(schema):
 
 def test_normalized_output_matches_json_schema(schema, tmp_path):
     raw = write(tmp_path, "raw.json", run_scan(ROOT / "examples" / "vulnerable-demo"))
-    doc = normalize([raw], add=[str(ROOT / "examples/agent-findings.json")], triage=[str(ROOT / "examples/triage.json")])
+    doc = normalize([raw], add=[str(SKILL / "examples/agent-findings.json")], triage=[str(SKILL / "examples/triage.json")])
     jsonschema.validate(doc, schema)
     assert doc["stage"] == "normalized"
 
@@ -107,7 +107,7 @@ def test_baseline_keeps_ids_and_marks_new_and_resolved(make_repo, tmp_path):
 # ---------------------------------------------------------------- correlation / agent findings / triage
 
 def test_agent_findings_are_added_and_sanitized(tmp_path):
-    agent = json.loads((ROOT / "examples/agent-findings.json").read_text())
+    agent = json.loads((SKILL / "examples/agent-findings.json").read_text())
     agent["findings"][0]["evidence"]["sanitized_code"] = "token = \"" + "gh" + "p_" + "Q9w8" * 9 + "\""
     path = write(tmp_path, "agent.json", agent)
     doc = normalize([], add=[path])
@@ -147,7 +147,7 @@ def test_triage_requires_justification(tmp_path):
 
 def test_triage_preserves_original_values(tmp_path):
     raw = write(tmp_path, "raw.json", run_scan(ROOT / "examples" / "vulnerable-demo"))
-    doc = normalize([raw], triage=[str(ROOT / "examples/triage.json")])
+    doc = normalize([raw], triage=[str(SKILL / "examples/triage.json")])
     fp = [f for f in doc["findings"] if f["status"] == "False Positive"]
     assert len(fp) == 1
     assert fp[0]["triage"]["original_status"] == "Needs Manual Review"

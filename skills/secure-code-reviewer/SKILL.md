@@ -105,7 +105,8 @@ privileges and whether it looks real; never auto-Critical.
 
 Every reported finding has: id, title, severity, confidence, status, CWE, OWASP category, file and lines,
 sanitized evidence, technical explanation, impact, exploitation conditions, recommended fix, fixed code when
-viable, a safe security test, a regression test and how to verify the fix. See `examples/sample-review.md`.
+viable, a safe security test, a regression test and how to verify the fix. Layout in `assets/report-template.md`;
+a full worked example is in the project repository (examples/sample-review.md), not in this package.
 
 ## Final answer to the user
 

@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from conftest import ROOT, fake_secret, rule_ids, run_scan
+from conftest import ROOT, SKILL, fake_secret, rule_ids, run_scan
 
 import dependency_parsers
 import external_tools
@@ -24,7 +24,7 @@ import normalize_findings as N
 import scan_repository
 import scr_common as C
 
-TEMPLATE = (ROOT / "assets" / "report-template.md").read_text(encoding="utf-8")
+TEMPLATE = (SKILL / "assets" / "report-template.md").read_text(encoding="utf-8")
 
 
 def secret_repo(make_repo):

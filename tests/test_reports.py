@@ -12,14 +12,14 @@ from argparse import Namespace
 
 import pytest
 
-from conftest import ROOT, run_scan
+from conftest import ROOT, SKILL, run_scan
 
 import ci_gate
 import generate_report as G
 import normalize_findings as N
 import scr_common as C
 
-TEMPLATE = (ROOT / "assets" / "report-template.md").read_text(encoding="utf-8")
+TEMPLATE = (SKILL / "assets" / "report-template.md").read_text(encoding="utf-8")
 PLACEHOLDERS = re.findall(r"\{\{(\w+)\}\}", TEMPLATE)
 
 
@@ -28,8 +28,8 @@ def normalized(tmp_path_factory):
     tmp = tmp_path_factory.mktemp("rep")
     raw = tmp / "raw.json"
     raw.write_text(json.dumps(run_scan(ROOT / "examples" / "vulnerable-demo")))
-    return N.build(Namespace(inputs=[str(raw)], add=[str(ROOT / "examples/agent-findings.json")],
-                             triage=[str(ROOT / "examples/triage.json")], baseline=None, output=None))
+    return N.build(Namespace(inputs=[str(raw)], add=[str(SKILL / "examples/agent-findings.json")],
+                             triage=[str(SKILL / "examples/triage.json")], baseline=None, output=None))
 
 
 def test_markdown_has_all_sections(normalized):

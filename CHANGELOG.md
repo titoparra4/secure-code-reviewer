@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.0] - Unreleased
+
+### Changed
+- The installable skill moved to `skills/secure-code-reviewer/` (SKILL.md, scripts, references, schemas,
+  assets, agent metadata, the agent-findings/triage format examples and a copy of the license). The
+  intentionally vulnerable demos, sample reports, tests and CI example stay at the repository root, so
+  `npx skills add` and manual installs no longer copy vulnerable demo code into the user's skills directory.
+  This also removes those demo files from the package that skills.sh security audits (Socket) analyze.
+- Manual installation now copies `skills/secure-code-reviewer/` instead of cloning the whole repository
+  into the skills directory. The CI example uses `.scr-tool/skills/secure-code-reviewer/scripts/`.
+- `validate_skill.py` validates the skill package by default and the surrounding repository with
+  `--repo-root`; it fails if vulnerable demos or sample reports end up inside the skill package.
+
 ## [1.0.0] - 2026-11-08
 
 ### Added
