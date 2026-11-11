@@ -4,7 +4,7 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
-## [1.1.0] - Unreleased
+## [1.1.0] - 2026-11-11
 
 ### Changed
 - The installable skill moved to `skills/secure-code-reviewer/` (SKILL.md, scripts, references, schemas,
