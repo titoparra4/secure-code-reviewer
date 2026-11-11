@@ -20,15 +20,18 @@ Content prepared for the repository page and the first release.
 - Protect `main`: require the `validate` workflow and one review.
 - Default workflow permissions: read-only.
 
-## Release v1.0.0
+## Releasing a version
+
+The installable package is `skills/secure-code-reviewer/`; release archives contain only that folder.
 
 ```bash
-git tag -a v1.0.0 -m "Secure Code Reviewer v1.0.0"
-git push origin v1.0.0
-gh release create v1.0.0 --title "Secure Code Reviewer v1.0.0" --notes-file docs/release-notes-v1.0.0.md
+V=v1.1.0
+git tag -a $V -m "Secure Code Reviewer $V"
+git push origin $V
+gh release create $V --title "Secure Code Reviewer $V" --notes-file docs/release-notes-$V.md
 # optional: attach an installable archive for skill upload UIs
-git archive --format=zip --prefix=secure-code-reviewer/ -o secure-code-reviewer-v1.0.0.zip v1.0.0
-gh release upload v1.0.0 secure-code-reviewer-v1.0.0.zip
+git archive --format=zip --prefix=secure-code-reviewer/ -o secure-code-reviewer-$V.zip $V:skills/secure-code-reviewer
+gh release upload $V secure-code-reviewer-$V.zip
 ```
 
 ## Release notes (example)

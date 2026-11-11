@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 TOOL_NAME = "secure-code-reviewer"
-TOOL_VERSION = "1.0.0"
+TOOL_VERSION = "1.1.0"
 SCHEMA_VERSION = "1.0.0"
 INFO_URI = "https://github.com/titoparra4/secure-code-reviewer"
 

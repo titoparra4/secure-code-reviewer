@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Validate the skill package structure (used in CI and before publishing).
 
-Checks: SKILL.md frontmatter (name/description rules of the Agent Skills format), referenced
-files exist, JSON files parse, the findings schema and example reports are consistent, scripts
-compile, and example data contains no unredacted secrets in reports. Nothing is executed.
+Skill package checks (the folder that gets installed): SKILL.md frontmatter (name/description rules
+of the Agent Skills format), referenced files exist, JSON files parse, the findings schema is in sync and
+scripts compile. With --repo-root, also the repository around it: project files, sample reports are
+valid and contain no unredacted secrets, tests compile, and workflows are least-privilege.
+Nothing is executed.
 
 Exit codes: 0 = valid, 1 = validation errors, 2 = usage error.
 """
@@ -21,12 +23,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import scr_common as C  # noqa: E402
 
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
-REQUIRED_FILES = [
-    "SKILL.md", "README.md", "LICENSE", "CONTRIBUTING.md", "SECURITY.md", "CHANGELOG.md", ".gitignore",
-    "agents/openai.yaml", "schemas/findings.schema.json", "assets/report-template.md",
+SKILL_FILES = [
+    "SKILL.md", "LICENSE", "agents/openai.yaml", "schemas/findings.schema.json", "assets/report-template.md",
     "scripts/scan_repository.py", "scripts/normalize_findings.py", "scripts/generate_report.py",
-    "scripts/validate_skill.py", "scripts/ci_gate.py", "examples/sample-report.json", "examples/sample-review.md",
+    "scripts/validate_skill.py", "scripts/ci_gate.py", "examples/agent-findings.json", "examples/triage.json",
 ]
+REPO_FILES = [
+    "README.md", "LICENSE", "CONTRIBUTING.md", "SECURITY.md", "CHANGELOG.md", ".gitignore",
+    "examples/sample-report.json", "examples/sample-review.md", "examples/sample-report.sarif",
+]
+# Intentionally vulnerable fixtures must never ship inside the installed skill package.
+FORBIDDEN_IN_SKILL = ["examples/vulnerable-demo", "examples/secure-demo", "examples/sample-review.md"]
 
 
 def parse_frontmatter(text: str) -> Tuple[Optional[Dict[str, str]], str]:
@@ -55,12 +62,15 @@ def parse_frontmatter(text: str) -> Tuple[Optional[Dict[str, str]], str]:
     return data, ""
 
 
-def validate(root: Path) -> Tuple[List[str], List[str]]:
+def validate(root: Path, repo_root: Optional[Path] = None) -> Tuple[List[str], List[str]]:
     errors: List[str] = []
     warnings: List[str] = []
-    for rel in REQUIRED_FILES:
+    for rel in SKILL_FILES:
         if not (root / rel).is_file():
             errors.append(f"missing required file: {rel}")
+    for rel in FORBIDDEN_IN_SKILL:
+        if (root / rel).exists():
+            errors.append(f"{rel} must live in the repository, not in the installable skill package")
     skill = root / "SKILL.md"
     if skill.is_file():
         text = skill.read_text(encoding="utf-8")
@@ -106,6 +116,33 @@ def validate(root: Path) -> Tuple[List[str], List[str]]:
             errors.append("schema finding.required is out of sync with scr_common.validate_finding")
         if schema["properties"]["schema_version"].get("const") != C.SCHEMA_VERSION:
             errors.append("schema_version const differs from scr_common.SCHEMA_VERSION")
+    for py in sorted((root / "scripts").glob("*.py")):
+        errors.extend(_compile_error(py, root))
+    openai = root / "agents/openai.yaml"
+    if openai.is_file():
+        content = openai.read_text(encoding="utf-8")
+        for key in ("interface:", "display_name:", "short_description:"):
+            if key not in content:
+                errors.append(f"agents/openai.yaml missing '{key}'")
+    if repo_root is not None:
+        errors.extend(validate_repo(repo_root))
+    return errors, warnings
+
+
+def _compile_error(py: Path, base: Path) -> List[str]:
+    try:
+        compile(py.read_text(encoding="utf-8"), str(py), "exec")  # in memory: no .pyc written
+    except SyntaxError as exc:
+        return [f"{py.relative_to(base)} does not compile: line {exc.lineno}: {exc.msg}"]
+    return []
+
+
+def validate_repo(root: Path) -> List[str]:
+    """Checks for the development repository that contains the skill (not shipped to users)."""
+    errors: List[str] = []
+    for rel in REPO_FILES:
+        if not (root / rel).is_file():
+            errors.append(f"missing repository file: {rel}")
     sample = root / "examples/sample-report.json"
     if sample.is_file():
         try:
@@ -119,36 +156,30 @@ def validate(root: Path) -> Tuple[List[str], List[str]]:
             content = report.read_text(encoding="utf-8")
             if C.redact_secrets(content) != content:
                 errors.append(f"{report.relative_to(root)} contains an unredacted secret-like value")
-    for py in sorted((root / "scripts").glob("*.py")) + sorted((root / "tests").glob("*.py")):
-        try:
-            compile(py.read_text(encoding="utf-8"), str(py), "exec")  # in memory: no .pyc written
-        except SyntaxError as exc:
-            errors.append(f"{py.relative_to(root)} does not compile: line {exc.lineno}: {exc.msg}")
-    openai = root / "agents/openai.yaml"
-    if openai.is_file():
-        content = openai.read_text(encoding="utf-8")
-        for key in ("interface:", "display_name:", "short_description:"):
-            if key not in content:
-                errors.append(f"agents/openai.yaml missing '{key}'")
+    for py in sorted((root / "tests").glob("*.py")):
+        errors.extend(_compile_error(py, root))
     for wf in sorted((root / ".github/workflows").glob("*.y*ml")) if (root / ".github/workflows").is_dir() else []:
         content = wf.read_text(encoding="utf-8")
         if not re.search(r"(?m)^permissions\s*:", content):
             errors.append(f"{wf.relative_to(root)} must declare top-level least-privilege permissions")
         if "write-all" in content or "pull_request_target" in content:
             errors.append(f"{wf.relative_to(root)} uses write-all or pull_request_target")
-    return errors, warnings
+    return errors
 
 
 def main(argv: Optional[List[str]] = None) -> int:
     ap = argparse.ArgumentParser(description="Validate the Secure Code Reviewer skill package.")
     ap.add_argument("root", nargs="?", default=str(Path(__file__).resolve().parent.parent))
+    ap.add_argument("--repo-root", help="also validate the development repository at this path")
     ap.add_argument("--strict", action="store_true", help="treat warnings as errors")
     args = ap.parse_args(argv)
     root = Path(args.root).resolve()
-    if not root.is_dir():
-        print(f"error: not a directory: {root}", file=sys.stderr)
-        return 2
-    errors, warnings = validate(root)
+    repo_root = Path(args.repo_root).resolve() if args.repo_root else None
+    for d in (root, repo_root):
+        if d is not None and not d.is_dir():
+            print(f"error: not a directory: {d}", file=sys.stderr)
+            return 2
+    errors, warnings = validate(root, repo_root)
     for w in warnings:
         print(f"warning: {w}")
     for e in errors:

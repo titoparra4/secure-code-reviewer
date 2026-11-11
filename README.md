@@ -74,9 +74,9 @@ Evidence is always sanitized:
 DATABASE_URL = "postgresql://demo_user:[REDACTED:connection-string-password:len=17]@db.internal:5432/shop"
 ```
 
-`SCR-0003` (IDOR) was added by the agent's manual review (`examples/agent-findings.json`), something no
+`SCR-0003` (IDOR) was added by the agent's manual review ([`examples/agent-findings.json`](skills/secure-code-reviewer/examples/agent-findings.json)), something no
 pattern rule can detect; a weak-hash candidate used only for a cache key was triaged as a False Positive
-with a written justification (`examples/triage.json`).
+with a written justification ([`examples/triage.json`](skills/secure-code-reviewer/examples/triage.json)).
 
 ## Architecture
 
@@ -98,13 +98,15 @@ with a written justification (`examples/triage.json`).
 
 ```text
 secure-code-reviewer/
-├── SKILL.md                    # skill entry point (frontmatter + operating instructions)
-├── agents/openai.yaml          # optional UI metadata for OpenAI Codex
-├── references/                 # methodology, severity, OWASP/ASVS mapping, topic guides
-├── scripts/                    # stdlib-only Python tooling
-├── schemas/findings.schema.json
-├── assets/report-template.md
-├── examples/                   # vulnerable + secure demos, sample reports, CI workflow
+├── skills/secure-code-reviewer/   # the installable skill package (what users get)
+│   ├── SKILL.md                    # skill entry point (frontmatter + operating instructions)
+│   ├── agents/openai.yaml          # optional UI metadata for OpenAI Codex
+│   ├── references/                 # methodology, severity, OWASP/ASVS mapping, topic guides
+│   ├── scripts/                    # stdlib-only Python tooling
+│   ├── schemas/findings.schema.json
+│   ├── assets/report-template.md
+│   └── examples/                   # agent-findings and triage file formats
+├── examples/                       # vulnerable + secure demos, sample reports, CI workflow (not installed)
 ├── tests/                      # pytest suite (detection, schema, ids, reports, safety)
 └── .github/workflows/validate.yml
 ```
@@ -120,22 +122,25 @@ secure-code-reviewer/
 
 ## Installation
 
-The skill folder must be named `secure-code-reviewer` (the skill `name`).
+The skill lives in [`skills/secure-code-reviewer/`](skills/secure-code-reviewer); only that folder is
+installed. The rest of the repository (tests, intentionally vulnerable demo apps, sample reports) is for
+development and is never copied into your skills directory. The installed folder must be named
+`secure-code-reviewer` (the skill `name`).
 
 ### Claude Code
 
 Personal (available in all projects):
 
 ```bash
-git clone --depth 1 --branch v1.0.0 https://github.com/titoparra4/secure-code-reviewer.git \
-  ~/.claude/skills/secure-code-reviewer
+git clone --depth 1 --branch v1.1.0 https://github.com/titoparra4/secure-code-reviewer.git /tmp/scr
+mkdir -p ~/.claude/skills && cp -R /tmp/scr/skills/secure-code-reviewer ~/.claude/skills/
 ```
 
 Project-scoped (shared with your team through the repository):
 
 ```bash
-git clone --depth 1 --branch v1.0.0 https://github.com/titoparra4/secure-code-reviewer.git \
-  .claude/skills/secure-code-reviewer
+git clone --depth 1 --branch v1.1.0 https://github.com/titoparra4/secure-code-reviewer.git /tmp/scr
+mkdir -p .claude/skills && cp -R /tmp/scr/skills/secure-code-reviewer .claude/skills/
 ```
 
 Claude Code discovers skills in these directories automatically; ask *"Review this repository for
@@ -148,12 +153,12 @@ Where custom skills are enabled for your plan, upload the skill as a ZIP whose t
 enabled for the scripts):
 
 ```bash
-git archive --format=zip --prefix=secure-code-reviewer/ -o secure-code-reviewer.zip v1.0.0
+git archive --format=zip --prefix=secure-code-reviewer/ -o secure-code-reviewer.zip v1.1.0:skills/secure-code-reviewer
 ```
 
 ### OpenAI Codex
 
-Codex supports skills in the same `SKILL.md` format. Copy or clone the folder into the skills directory
+Codex supports skills in the same `SKILL.md` format. Copy `skills/secure-code-reviewer/` into the skills directory
 documented for your Codex version (check the current Codex documentation; user-level skills have lived
 under `~/.codex/skills/`). `agents/openai.yaml` supplies optional display metadata.
 
@@ -164,7 +169,7 @@ workspace offers skills. If it does not:
 
 1. Provide `SKILL.md` as instructions (e.g. a Project's instructions or a custom GPT), and upload the
    `references/` files as knowledge files.
-2. To use the scripts, upload the repository ZIP in a conversation with code execution (Python) enabled
+2. To use the scripts, upload a ZIP of `skills/secure-code-reviewer/` in a conversation with code execution (Python) enabled
    and ask the assistant to run `scripts/scan_repository.py`; they need only the standard library.
 3. Without code execution, the assistant follows the "Reviewing without tooling" procedure in
    `references/security-methodology.md`.
@@ -178,11 +183,11 @@ The skill is installable with the open [`skills` CLI](https://github.com/vercel-
 # preview what the repository contains (installs nothing)
 npx skills add titoparra4/secure-code-reviewer --list
 
-# install the v1.0.0 release globally for Claude Code
-npx skills add titoparra4/secure-code-reviewer@v1.0.0 -g -a claude-code
+# install the v1.1.0 release globally for Claude Code
+npx skills add titoparra4/secure-code-reviewer@v1.1.0 -g -a claude-code
 
 # other agents, e.g. Codex, or several at once
-npx skills add titoparra4/secure-code-reviewer@v1.0.0 -g -a claude-code codex
+npx skills add titoparra4/secure-code-reviewer@v1.1.0 -g -a claude-code codex
 
 # list, update, remove
 npx skills list -g
@@ -200,9 +205,9 @@ install telemetry, which is what lists the skill on skills.sh; set `DISABLE_TELE
 ### Verify the installation
 
 ```bash
-cd secure-code-reviewer
+cd ~/.claude/skills/secure-code-reviewer   # or wherever you installed it
 python3 scripts/validate_skill.py
-python3 scripts/scan_repository.py examples/vulnerable-demo --mode quick -o /tmp/scr-check.json
+python3 scripts/scan_repository.py /path/to/repo --mode quick -o /tmp/scr-check.json
 ```
 
 ## Usage
@@ -222,6 +227,8 @@ Natural-language prompts map to modes automatically:
 - "Export the security report as JSON." → `generate_report.py -f json`
 
 ### Command line
+
+Run from the skill folder (`skills/secure-code-reviewer/` in this repository, or your installed copy).
 
 ```bash
 # 1. scan (read-only, offline); write outputs outside the scanned tree
@@ -259,7 +266,7 @@ Useful scanner options: `--mode pr --git-diff origin/main`, `--changed-files-fro
 
 ## Output format
 
-Every document validates against [`schemas/findings.schema.json`](schemas/findings.schema.json)
+Every document validates against [`schemas/findings.schema.json`](skills/secure-code-reviewer/schemas/findings.schema.json)
 (JSON Schema 2020-12). A finding looks like:
 
 ```json
@@ -286,7 +293,7 @@ Every document validates against [`schemas/findings.schema.json`](schemas/findin
 
 Statuses: `Confirmed` (agent/human only), `Probable`, `Needs Manual Review`, `False Positive` (justified),
 `Not Verified`. Severity levels, confidence, priorities and the CVSS v4.0 policy are defined in
-[`references/severity-classification.md`](references/severity-classification.md).
+[`references/severity-classification.md`](skills/secure-code-reviewer/references/severity-classification.md).
 
 ## CI/CD integration
 
@@ -302,7 +309,7 @@ Copy [`examples/ci/secure-code-review.yml`](examples/ci/secure-code-review.yml) 
 - **No secrets in logs**: the gate prints ids, titles and locations only.
 
 Running an AI agent inside CI is possible but should be advisory only (non-deterministic, exposed to prompt
-injection from PR content). See [`references/ci-integration.md`](references/ci-integration.md).
+injection from PR content). See [`references/ci-integration.md`](skills/secure-code-reviewer/references/ci-integration.md).
 
 ## Limitations
 
@@ -325,7 +332,8 @@ injection from PR content). See [`references/ci-integration.md`](references/ci-i
   documents containing unredacted secret-like values fail validation.
 - Repository content is treated as untrusted data; embedded instructions aimed at AI agents are reported,
   not followed.
-- Vulnerable examples use fictitious data only.
+- Vulnerable examples use fictitious data only and live outside the installable skill package, so they
+  are never copied into a user's skills directory.
 
 Report vulnerabilities in this project as described in [SECURITY.md](SECURITY.md).
 

@@ -30,7 +30,7 @@ jobs:
       - name: Install test dependencies
         run: python -m pip install -r requirements-dev.txt
       - name: Validate skill package
-        run: python scripts/validate_skill.py --strict
+        run: python skills/secure-code-reviewer/scripts/validate_skill.py skills/secure-code-reviewer --repo-root . --strict
       - name: Run tests
         run: python -m pytest -q
       - name: Examples match current implementation

@@ -6,7 +6,7 @@
       "tool": {
         "driver": {
           "name": "Secure Code Reviewer",
-          "semanticVersion": "1.0.0",
+          "semanticVersion": "1.1.0",
           "informationUri": "https://github.com/titoparra4/secure-code-reviewer",
           "rules": [
             {
