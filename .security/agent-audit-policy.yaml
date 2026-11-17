@@ -1,0 +1,83 @@
+# Agent security audit policy and triage for this repository.
+# Consumed by intelligent-agent-security-auditor (https://github.com/titoparra4/intelligent-agent-security-auditor).
+# The auditor accepts triage decisions only as policy `exceptions` (owner, approved_by, justification >= 10
+# chars, expires); path exclusions are CLI-only (`--exclude`). Run it with `make agent-audit`, i.e.:
+#
+#   agent-security-auditor audit . --policy .security/agent-audit-policy.yaml \
+#       --exclude tests --exclude examples/vulnerable-demo --format markdown,json -o <dir outside the repo>
+#
+# Out of scope (pass both --exclude flags above), with reasons:
+#   tests/                    pytest suite of the skill. It builds fictitious, fragment-assembled secrets
+#                             (tests/conftest.py::fake_secret), placeholder credentials and an incomplete
+#                             PEM header as *string fixtures* to check that the scanner detects and redacts
+#                             them. No credential in it is real and none of its code is shipped in the skill.
+#   examples/vulnerable-demo/ intentionally vulnerable demo application used to generate examples/sample-*.
+#                             Its unpinned / VCS dependencies and insecure configs are the expected test input.
+#
+# Everything else below is the builtin `basic-agent` profile, unchanged. The exceptions document the three
+# blocking findings that appear when the audit is run WITHOUT the exclusions (e.g. `--policy basic-agent`).
+# They match the auditor's stable finding_id (line-independent fingerprint) so that a NEW secret in the same
+# file is still reported. Review them before `expires`; expired exceptions are ignored by the auditor.
+policy_version: "1.0"
+name: secure-code-reviewer-basic-agent
+description: basic-agent profile plus documented false positives in test fixtures (secure-code-reviewer repository).
+human_approval:
+  required_for: [send, delete, execute, financial, infra]
+isolation:
+  require_per_user_memory: true
+  require_sandboxed_code_execution: true
+autonomy:
+  require_max_iterations: true
+blocking:
+  severities: [CRITICAL, HIGH]
+  potential_severities: [CRITICAL]
+  require_acceptance_at: MEDIUM
+evidence:
+  accept_declared: true
+mandatory_controls:
+  - CTRL-ARCH-01
+  - CTRL-DATA-01
+  - CTRL-PI-01
+  - CTRL-PERM-01
+  - CTRL-EXF-01
+  - CTRL-AUTO-01
+  - CTRL-AUTO-03
+  - CTRL-MCP-03
+exceptions:
+  # SEC-001 - DATA-001 HIGH/CONFIRMED - tests/test_security.py:34
+  - finding_id: ASA-A17DBADE29BE
+    rule_id: DATA-001
+    asset: "file:tests/test_security.py"
+    owner: titoparra4 (repository maintainer)
+    approved_by: titoparra4 (manual review of the 2026-11-17 audit)
+    justification: >-
+      False positive. Line 34 is an f-string inside the test helper secret_repo() that writes a temporary
+      config.py for the scanner tests. The flagged password of the PostgreSQL connection string is the
+      f-string placeholder pw; its runtime value comes from tests/conftest.py::fake_secret('password'),
+      a fictitious value assembled from fragments so that no complete credential exists in the repository.
+      The fixture is required by test_test_secrets_are_detected and test_reports_never_contain_secret_values.
+    expires: "2027-05-17"
+  # SEC-002 - DATA-001 HIGH/CONFIRMED - tests/test_security.py:61
+  - finding_id: ASA-0EA9F7C66D06
+    rule_id: DATA-001
+    asset: "file:tests/test_security.py"
+    owner: titoparra4 (repository maintainer)
+    approved_by: titoparra4 (manual review of the 2026-11-17 audit)
+    justification: >-
+      False positive. Line 61 belongs to test_placeholder_and_example_values_ignored, which asserts that the
+      scanner IGNORES documentation placeholders: a localhost PostgreSQL URL whose password is the literal
+      word 'password', the AWS documentation example key ID ending in EXAMPLE, 'your_api_key_here', a
+      PASSWORD placeholder in angle brackets and template variables. None of them is a credential; removing them would delete the regression test.
+    expires: "2027-05-17"
+  # SEC-003 - EXF-003 HIGH/POTENTIAL - tests/test_security.py:35
+  - finding_id: ASA-EA47B14B1CD6
+    rule_id: EXF-003
+    asset: "file:tests/test_security.py"
+    owner: titoparra4 (repository maintainer)
+    approved_by: titoparra4 (manual review of the 2026-11-17 audit)
+    justification: >-
+      False positive. Line 35 does not read ~/.ssh or any credential store: it is the dict key 'id_rsa' of a
+      fixture written to a pytest tmp_path. Its content is an incomplete, invalid PEM block (header plus a
+      12-character stub, split across string fragments) used to check private-key detection and redaction.
+      No file outside the temporary test directory is read or collected.
+    expires: "2027-05-17"

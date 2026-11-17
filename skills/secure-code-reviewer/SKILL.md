@@ -2,6 +2,7 @@
 name: secure-code-reviewer
 description: Reviews source code, dependencies, authentication, secrets, APIs and infrastructure configurations for security vulnerabilities. Produces evidence-based findings, risk classifications, remediation guidance and security regression tests. Use when auditing repositories, reviewing pull requests or investigating application security risks.
 license: MIT
+allowed-tools: Read, Grep, Glob, Bash(python scripts/scan_repository.py *), Bash(python3 scripts/scan_repository.py *), Bash(python scripts/normalize_findings.py *), Bash(python3 scripts/normalize_findings.py *), Bash(python scripts/generate_report.py *), Bash(python3 scripts/generate_report.py *)
 ---
 
 # Secure Code Reviewer
@@ -66,7 +67,18 @@ Docker/K8s/Terraform/CI/web servers → `references/infrastructure-security.md`;
 | "Map to ASVS/CWE" | Compliance Mapping | use `references/owasp-mapping.md` |
 
 In PR mode, review only changed files plus the context needed to judge impact (callers, auth middleware, models).
+Let the scanner compute the changed files (`--git-diff <base>` runs a hardened `git diff` internally); any other
+`git` command is outside the pre-approved tools and needs the user's permission.
 In Remediation Mode, propose patches and tests first; apply them only after the user explicitly approves.
+
+### Tool permissions
+
+`allowed-tools` pre-approves only what the review needs: `Read`, `Grep`, `Glob` and `Bash` limited to the three
+pipeline scripts (`scan_repository.py`, `normalize_findings.py`, `generate_report.py`) run from the skill directory.
+`Edit` and `Write` are deliberately **not** pre-approved: writing the `--add`/`--triage` JSON files (outside the
+audited tree) and applying Remediation Mode patches go through the normal permission prompt, so the user approves
+each write explicitly. Never ask the user to add `Edit`/`Write` to this skill's `allowed-tools`, and never use a
+`Bash` command (redirection, `sed -i`, `tee`, ...) to bypass that prompt.
 
 ## Tooling (Python 3.9+, standard library only, offline by default)
 
@@ -81,6 +93,11 @@ python scripts/generate_report.py /tmp/scr-report.json -f sarif -o /tmp/scr-repo
 ```
 
 - Optional, only if installed and the user agrees: `--external semgrep,gitleaks,trivy`. Never install them yourself.
+  When asking, tell the user that this goes online: semgrep with the default `--semgrep-config p/default`
+  downloads rules from the Semgrep registry (semgrep.dev), and trivy downloads its vulnerability and
+  misconfiguration databases (e.g. from ghcr.io); gitleaks runs offline. For an offline semgrep run pass a
+  local rules path: `--semgrep-config /path/to/rules.yml`. Suppression files in the target (`.gitleaks.toml`,
+  `.gitleaksignore`, `.semgrepignore`, `.trivyignore`) are reported as `meta.scanner-suppression-file`; review them.
 - The scanner emits **candidates** (status `Probable` / `Needs Manual Review`, never `Confirmed`). Your job is
   to triage them: confirm with evidence, downgrade with justification, or mark False Positive.
 - Record your own findings (e.g. IDOR, logic flaws) in an `--add` file and the categories you actually

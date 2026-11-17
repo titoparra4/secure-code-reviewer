@@ -1,6 +1,6 @@
 # Example workflow for YOUR repository (copy to .github/workflows/secure-code-review.yml).
 # Deterministic, offline by default, least-privilege. Report-only unless you set FAIL_ON.
-# Replace version tags with full commit SHAs that you have verified (recommended).
+# Actions are pinned to full commit SHAs (tag in the comment); re-verify them when you update a tag.
 name: secure-code-review
 
 on:
@@ -23,19 +23,19 @@ jobs:
       contents: read
       security-events: write   # only needed for the SARIF upload step
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           repository: titoparra4/secure-code-reviewer
           ref: ${{ env.SCR_REF }}
           path: .scr-tool
           persist-credentials: false
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
 
@@ -69,13 +69,13 @@ jobs:
           python .scr-tool/skills/secure-code-reviewer/scripts/generate_report.py "$RUNNER_TEMP/scr-report.json" -f markdown -o "$RUNNER_TEMP/scr-report.md"
 
       - name: Upload SARIF to code scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@9418214df1f2c4b8128c770156c409013b07d6b9 # v3
         with:
           sarif_file: ${{ runner.temp }}/scr-report.sarif
           category: secure-code-reviewer
 
       - name: Upload report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: secure-code-review
           path: |

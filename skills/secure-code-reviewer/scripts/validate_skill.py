@@ -27,6 +27,7 @@ SKILL_FILES = [
     "SKILL.md", "LICENSE", "agents/openai.yaml", "schemas/findings.schema.json", "assets/report-template.md",
     "scripts/scan_repository.py", "scripts/normalize_findings.py", "scripts/generate_report.py",
     "scripts/validate_skill.py", "scripts/ci_gate.py", "examples/agent-findings.json", "examples/triage.json",
+    "assets/gitleaks.toml",  # passed to gitleaks with --config by scripts/external_tools.py
 ]
 REPO_FILES = [
     "README.md", "LICENSE", "CONTRIBUTING.md", "SECURITY.md", "CHANGELOG.md", ".gitignore",

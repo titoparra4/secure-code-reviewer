@@ -580,6 +580,17 @@ P: Dict[str, Dict[str, str]] = {
         regression_test="N/A.",
         verification="Manual review of the surrounding content and its history.",
         effort="Low"),
+    "suppression-file": dict(
+        description="The repository ships a configuration/ignore file read by an external security scanner.",
+        impact="Entries in this file can silently drop scanner results (allowlisted secrets, ignored paths or CVEs).",
+        conditions="Relevant whenever gitleaks, semgrep or trivy run against this repository (here or in CI).",
+        recommendation="Review every entry and its history: each suppression needs a written justification and an owner. "
+                       "Prefer a triage file kept outside the scanned tree for security decisions.",
+        fixed_example="(remove unjustified entries; document the rest)",
+        security_test="N/A - manual review.",
+        regression_test="N/A.",
+        verification="Re-run the external tool and compare results with and without the file.",
+        effort="Low"),
 }
 
 

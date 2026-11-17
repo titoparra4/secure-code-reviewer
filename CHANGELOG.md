@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Security
+- `SKILL.md` declares `allowed-tools`: only `Read`, `Grep`, `Glob` and the three pipeline scripts are
+  pre-approved. `Edit`/`Write` (triage files, Remediation Mode patches) always need explicit user approval.
+- External tools can no longer be silenced by the audited repository: semgrep runs with `--disable-nosem`
+  (and `--x-ignore-semgrepignore-files` when supported), gitleaks with the skill's own
+  `assets/gitleaks.toml`, `--ignore-gitleaks-allow` and an empty `--gitleaks-ignore-path`, trivy with an
+  empty `--ignorefile`.
+- New informational finding `meta.scanner-suppression-file` when the target root contains `.gitleaks.toml`,
+  `.gitleaksignore`, `.semgrepignore` or `.trivyignore` (gitleaks 8.x always loads `<target>/.gitleaksignore`).
+- `SKILL.md` and `scan_repository.py` state that `--external` semgrep (`p/default`) and trivy download rules
+  and databases from the internet; `--semgrep-config` accepts a local path for offline runs.
+- GitHub Actions in `validate.yml` and the CI example are pinned to full commit SHAs.
+- Development dependencies pinned with `==` (with Python 3.9 markers).
+
+### Added
+- `.security/agent-audit-policy.yaml` and `make agent-audit`: agent security audit policy with documented
+  test-fixture false positives and scope exclusions (`tests/`, `examples/vulnerable-demo/`).
+
 ## [1.1.0] - 2026-11-11
 
 ### Changed

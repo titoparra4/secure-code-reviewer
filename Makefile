@@ -5,8 +5,10 @@ PYTHON ?= python3
 TMP := $(shell mktemp -d 2>/dev/null || echo /tmp/scr-make)
 SKILL := skills/secure-code-reviewer
 S := $(SKILL)/scripts
+AGENT_AUDITOR ?= agent-security-auditor
+AGENT_AUDIT_OUT ?= $(TMP)/agent-audit
 
-.PHONY: test validate examples examples-check
+.PHONY: test validate examples examples-check agent-audit
 
 test:
 	$(PYTHON) -m pytest -q
@@ -29,3 +31,8 @@ examples-check:
 	diff -u examples/sample-review.md $(TMP)/sample-review.md
 	diff -u examples/sample-report.sarif $(TMP)/sample-report.sarif
 	@echo "examples are up to date"
+
+# Agent security audit with this repository's policy and documented scope (see .security/agent-audit-policy.yaml).
+agent-audit:
+	$(AGENT_AUDITOR) audit . --policy .security/agent-audit-policy.yaml \
+		--exclude tests --exclude examples/vulnerable-demo --format markdown,json -o $(AGENT_AUDIT_OUT)
