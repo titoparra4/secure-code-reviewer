@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Documentation
+- `SECURITY.md`: supported versions updated (1.2.x only); new *Threat model* section (trust boundaries,
+  mitigations, prompt injection as an open residual risk, host responsibilities and the scope of the
+  `allowed-tools` wildcards) and *Agent security audit* section (`make agent-audit`, expected exit 30).
+
 ## [1.2.0] - 2026-11-17
 
 ### Security
