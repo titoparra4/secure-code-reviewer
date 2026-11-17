@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 env:
-  SCR_REF: v1.1.0          # release of secure-code-reviewer to use
+  SCR_REF: v1.2.0          # release of secure-code-reviewer to use
   FAIL_ON: none            # none | critical | high | medium | low
   BLOCK_STATUSES: Confirmed,Probable
 
