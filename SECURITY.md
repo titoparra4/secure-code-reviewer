@@ -83,7 +83,8 @@ credentials, network egress and MCP servers. This skill cannot enforce any of th
 - Do not audit untrusted repositories with broad auto-approval modes or with sensitive credentials (cloud,
   registry, Git tokens) in the environment.
 - The `*` wildcards in `allowed-tools` pre-approve **any** arguments to the three scripts, including
-  `--external`, `--osv`, `-o` (any output path outside the target) and `--allow-write-in-target`. If that
+  `--external`, `--osv`, `-o` (any output path; only `scan_repository.py` refuses paths inside the target
+  unless `--allow-write-in-target` is passed) and `--allow-write-in-target`. If that
   matters in your setting, restrict them with your host's own permission settings.
 
 ## Agent security audit
@@ -102,6 +103,7 @@ Run `make agent-audit` (requires `agent-security-auditor`; policy and scope in
 
 - No automatic installation of external tools.
 - Redaction of secret values in every evidence snippet; documents with unredacted secret-like values fail validation.
-- Symlinks are not followed; file size/count limits; output inside the target requires an explicit flag.
+- Symlinks are not followed; file size/count limits; `scan_repository.py` refuses output inside the target without
+  `--allow-write-in-target` (`normalize_findings.py` and `generate_report.py` do not restrict `-o`).
 - Git references are validated before use; git runs with hooks and fsmonitor disabled.
 - The CI gate prints no evidence, only identifiers and locations.
