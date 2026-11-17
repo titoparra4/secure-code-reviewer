@@ -10,6 +10,8 @@ All notable changes to this project are documented here. The format follows
 - `SECURITY.md`: supported versions updated (1.2.x only); new *Threat model* section (trust boundaries,
   mitigations, prompt injection as an open residual risk, host responsibilities and the scope of the
   `allowed-tools` wildcards) and *Agent security audit* section (`make agent-audit`, expected exit 30).
+- `SECURITY.md`: clarified that only `scan_repository.py` refuses `-o` paths inside the target without
+  `--allow-write-in-target`; `normalize_findings.py` and `generate_report.py` accept any output path.
 
 ## [1.2.0] - 2026-11-17
 
