@@ -14,6 +14,13 @@
 #   examples/vulnerable-demo/ intentionally vulnerable demo application used to generate examples/sample-*.
 #                             Its unpinned / VCS dependencies and insecure configs are the expected test input.
 #
+# Expected verdict: INSUFFICIENT_EVIDENCE (exit 30), not a failure. This repository is an agent skill that runs
+# inside a host (Claude Code / Codex): the agent loop, iteration limits, identity and permission prompts belong
+# to the host, so there is no agent manifest and the auditor reports "no agent components could be analysed".
+# A manifest was evaluated on 2026-11-17 and rejected: an honest one fails CTRL-PI-01 (the skill reads untrusted
+# code by design, isolated only by SKILL.md instructions) and passing it would require accepting that risk or
+# overstating controls. Treat exit 30 as accepted; exits 20 (NOT_READY) and 70 (scanner error) are regressions.
+#
 # Everything else below is the builtin `basic-agent` profile, unchanged. The exceptions document the three
 # blocking findings that appear when the audit is run WITHOUT the exclusions (e.g. `--policy basic-agent`).
 # They match the auditor's stable finding_id (line-independent fingerprint) so that a NEW secret in the same
