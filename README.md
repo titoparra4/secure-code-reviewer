@@ -132,14 +132,14 @@ development and is never copied into your skills directory. The installed folder
 Personal (available in all projects):
 
 ```bash
-git clone --depth 1 --branch v1.1.0 https://github.com/titoparra4/secure-code-reviewer.git /tmp/scr
+git clone --depth 1 --branch v1.2.0 https://github.com/titoparra4/secure-code-reviewer.git /tmp/scr
 mkdir -p ~/.claude/skills && cp -R /tmp/scr/skills/secure-code-reviewer ~/.claude/skills/
 ```
 
 Project-scoped (shared with your team through the repository):
 
 ```bash
-git clone --depth 1 --branch v1.1.0 https://github.com/titoparra4/secure-code-reviewer.git /tmp/scr
+git clone --depth 1 --branch v1.2.0 https://github.com/titoparra4/secure-code-reviewer.git /tmp/scr
 mkdir -p .claude/skills && cp -R /tmp/scr/skills/secure-code-reviewer .claude/skills/
 ```
 
@@ -153,7 +153,7 @@ Where custom skills are enabled for your plan, upload the skill as a ZIP whose t
 enabled for the scripts):
 
 ```bash
-git archive --format=zip --prefix=secure-code-reviewer/ -o secure-code-reviewer.zip v1.1.0:skills/secure-code-reviewer
+git archive --format=zip --prefix=secure-code-reviewer/ -o secure-code-reviewer.zip v1.2.0:skills/secure-code-reviewer
 ```
 
 ### OpenAI Codex
@@ -183,11 +183,11 @@ The skill is installable with the open [`skills` CLI](https://github.com/vercel-
 # preview what the repository contains (installs nothing)
 npx skills add titoparra4/secure-code-reviewer --list
 
-# install the v1.1.0 release globally for Claude Code
-npx skills add titoparra4/secure-code-reviewer@v1.1.0 -g -a claude-code
+# install the v1.2.0 release globally for Claude Code
+npx skills add titoparra4/secure-code-reviewer@v1.2.0 -g -a claude-code
 
 # other agents, e.g. Codex, or several at once
-npx skills add titoparra4/secure-code-reviewer@v1.1.0 -g -a claude-code codex
+npx skills add titoparra4/secure-code-reviewer@v1.2.0 -g -a claude-code codex
 
 # list, update, remove
 npx skills list -g

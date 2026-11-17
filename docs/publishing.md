@@ -25,7 +25,7 @@ Content prepared for the repository page and the first release.
 The installable package is `skills/secure-code-reviewer/`; release archives contain only that folder.
 
 ```bash
-V=v1.1.0
+V=v1.2.0
 git tag -a $V -m "Secure Code Reviewer $V"
 git push origin $V
 gh release create $V --title "Secure Code Reviewer $V" --notes-file docs/release-notes-$V.md
