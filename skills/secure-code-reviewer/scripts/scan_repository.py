@@ -7,7 +7,11 @@ parses dependency manifests and emits a findings document (schemas/findings.sche
 What this is NOT: a complete SAST engine. Results are candidate findings for agent/human triage.
 The scanner never executes code from the audited repository and never sends source code anywhere.
 Network access happens only with --osv (package names/versions to api.osv.dev) or via external
-tools you explicitly enable with --external.
+tools you explicitly enable with --external. Ask the user before enabling either, and say what goes out:
+semgrep with the default `--semgrep-config p/default` downloads its rules from the Semgrep registry
+(semgrep.dev) and trivy downloads its vulnerability/misconfiguration databases (e.g. from ghcr.io) on each
+run unless cached; gitleaks runs offline. For an offline semgrep run pass a local rules file or directory:
+`--semgrep-config /path/to/rules.yml`.
 
 Exit codes: 0 = scan completed (findings may exist), 2 = usage or I/O error.
 """
@@ -41,6 +45,13 @@ MODE_TAGS: Dict[str, Set[str]] = {
 MODE_SECRETS = {"quick", "full", "pr", "api", "secrets", "config"}
 MODE_DEPS = {"full", "pr", "dependencies"}
 QUICK_MIN_SEVERITY = "High"  # quick mode keeps only High+ code/auth rules (all secrets/config rules)
+# Files at the target root that external scanners read and that can hide their results.
+SUPPRESSION_FILES = {
+    ".gitleaks.toml": "gitleaks configuration (allowlists, disabled rules); not loaded: the skill passes its own --config",
+    ".gitleaksignore": "gitleaks fingerprint ignore list; gitleaks 8.x always loads it from the scanned directory",
+    ".semgrepignore": "semgrep path exclusions; ignored only if the installed semgrep accepts --x-ignore-semgrepignore-files",
+    ".trivyignore": "trivy vulnerability/misconfiguration ignore list; not loaded: the skill passes an empty --ignorefile",
+}
 
 COVERAGE_CATEGORIES: List[Tuple[str, Set[str], str]] = [
     ("Injection (SQL/NoSQL/Command/Code/SSTI)", {"code"}, "heuristic line rules + intra-file taint"),
@@ -460,6 +471,22 @@ class Scanner:
         return public, errors, pending
 
 
+def suppression_file_findings(root: Path) -> List[Dict[str, Any]]:
+    """Informational findings for scanner suppression files at the target root (always reported)."""
+    out: List[Dict[str, Any]] = []
+    for name, effect in sorted(SUPPRESSION_FILES.items()):
+        path = root / name
+        if path.is_symlink() or not path.is_file():
+            continue
+        out.append(make_finding(
+            rule_id="meta.scanner-suppression-file", title=f"Scanner suppression file present: {name}",
+            category="Untrusted Content", profile="suppression-file", cwe="CWE-693",
+            owasp="A05:2021-Security Misconfiguration", severity="Informational", confidence="High",
+            status="Needs Manual Review", rel=name, start=1, end=1, snippet=name, source="scanner",
+            description=f"{name}: {effect}. The audited repository controls this file; review its entries."))
+    return out
+
+
 # --------------------------------------------------------------------------- CLI
 
 SAFE_REF = re.compile(r"^[A-Za-z0-9][\w./~^@{}-]{0,200}$")
@@ -537,6 +564,8 @@ def build_document(args: argparse.Namespace) -> Dict[str, Any]:
                 end=max(1, r["end_line"]), snippet=r.get("snippet", ""), source=r["source"],
                 description=r.get("description") or r["title"],
                 occurrence=scanner.occurrence(r["rule_id"], r["file"], r.get("snippet", "") + str(r["start_line"]))))
+    for f in suppression_file_findings(root):
+        scanner.add(f)
     findings = scanner.findings
     C.assign_ids(findings)
     findings.sort(key=lambda f: (C.finding_sort_key(f), f["id"]))
@@ -610,7 +639,9 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     ap.add_argument("--git-diff", metavar="BASE_REF", help="pr mode: compute changed files with git diff BASE...HEAD")
     ap.add_argument("--osv", action="store_true", help="query api.osv.dev with package names/versions (network)")
     ap.add_argument("--external", help="comma-separated installed tools to run: semgrep,gitleaks,trivy")
-    ap.add_argument("--semgrep-config", default="p/default", help="semgrep --config value (default: p/default)")
+    ap.add_argument("--semgrep-config", default="p/default",
+                    help="semgrep --config value (default: p/default, downloaded from the Semgrep registry); "
+                         "pass a local rules file/directory to run offline")
     ap.add_argument("--tool-timeout", type=int, default=600, help="timeout in seconds for network/external tools")
     ap.add_argument("--allow-write-in-target", action="store_true", help="allow --output inside the scanned tree")
     args = ap.parse_args(argv)

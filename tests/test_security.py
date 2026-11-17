@@ -234,3 +234,112 @@ def test_osv_network_failure_keeps_not_verified(make_repo, monkeypatch):
     doc = run_scan(make_repo({"requirements.txt": "flask==2.0.1\n"}), "--mode", "dependencies", "--osv")
     assert doc["dependencies"][0]["vulnerability_status"] == "Not Verified"
     assert doc["tool_errors"][0]["tool"] == "osv"
+
+
+# ---------------------------------------------------------------- audited repo cannot hide external tool results
+
+def _value_after(cmd, flag):
+    return cmd[cmd.index(flag) + 1]
+
+
+def test_semgrep_ignores_nosem_and_semgrepignore(make_repo, monkeypatch):
+    monkeypatch.setattr(external_tools.shutil, "which", lambda name: "/usr/bin/" + name)
+    calls = []
+
+    def fake_run(cmd, **kwargs):
+        calls.append(cmd)
+        return subprocess.CompletedProcess(cmd, 0, stdout='{"results": []}', stderr="")
+    monkeypatch.setattr(external_tools.subprocess, "run", fake_run)
+    repo = make_repo({"a.py": "x = 1\n", ".semgrepignore": "*.py\n"})
+    run_scan(repo, "--external", "semgrep", "--semgrep-config", "/rules/local.yml")
+    assert len(calls) == 1
+    cmd = calls[0]
+    assert "--disable-nosem" in cmd and "--x-ignore-semgrepignore-files" in cmd
+    assert _value_after(cmd, "--config") == "/rules/local.yml" and cmd[-1] == str(repo)
+
+
+def test_semgrep_without_experimental_flag_retries_but_keeps_disable_nosem(make_repo, monkeypatch):
+    monkeypatch.setattr(external_tools.shutil, "which", lambda name: "/usr/bin/" + name)
+    calls = []
+
+    def fake_run(cmd, **kwargs):
+        calls.append(cmd)
+        if "--x-ignore-semgrepignore-files" in cmd:
+            return subprocess.CompletedProcess(cmd, 2, stdout="", stderr="Error: No such option: --x-ignore-semgrepignore-files")
+        return subprocess.CompletedProcess(cmd, 0, stdout='{"results": []}', stderr="")
+    monkeypatch.setattr(external_tools.subprocess, "run", fake_run)
+    doc = run_scan(make_repo({"a.py": "x = 1\n"}), "--external", "semgrep")
+    assert doc["tool_errors"] == [] and len(calls) == 2
+    assert "--x-ignore-semgrepignore-files" not in calls[1] and "--disable-nosem" in calls[1]
+
+
+def test_gitleaks_uses_skill_config_and_no_repo_ignores(make_repo, monkeypatch):
+    monkeypatch.setattr(external_tools.shutil, "which", lambda name: "/usr/bin/" + name)
+    repo = make_repo({"a.py": "x = 1\n", ".gitleaks.toml": "[allowlist]\npaths = ['''.*''']\n"})
+    seen = {}
+
+    def fake_run(cmd, **kwargs):
+        seen["cmd"] = cmd
+        ignore = Path(_value_after(cmd, "--gitleaks-ignore-path"))
+        seen["ignore_content"] = ignore.read_text(encoding="utf-8")
+        Path(_value_after(cmd, "--report-path")).write_text("[]", encoding="utf-8")
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+    monkeypatch.setattr(external_tools.subprocess, "run", fake_run)
+    doc = run_scan(repo, "--external", "gitleaks")
+    cmd = seen["cmd"]
+    config = Path(_value_after(cmd, "--config"))
+    assert doc["tool_errors"] == []
+    assert config == SKILL / "assets" / "gitleaks.toml" and config.is_file()
+    cfg_lines = [ln.strip() for ln in config.read_text(encoding="utf-8").splitlines() if not ln.lstrip().startswith("#")]
+    assert "useDefault = true" in cfg_lines and not any(ln.startswith(("[allowlist", "[[allowlist", "[[rules")) for ln in cfg_lines)
+    assert "--ignore-gitleaks-allow" in cmd
+    ignore = Path(_value_after(cmd, "--gitleaks-ignore-path"))
+    assert seen["ignore_content"] == "" and not C.is_within(repo, ignore)
+
+
+def test_gitleaks_legacy_detect_keeps_skill_config(make_repo, monkeypatch):
+    monkeypatch.setattr(external_tools.shutil, "which", lambda name: "/usr/bin/" + name)
+    calls = []
+
+    def fake_run(cmd, **kwargs):
+        calls.append(cmd)
+        if cmd[1] == "dir":
+            return subprocess.CompletedProcess(cmd, 1, stdout="", stderr='Error: unknown command "dir" for "gitleaks"')
+        if "--gitleaks-ignore-path" in cmd:
+            return subprocess.CompletedProcess(cmd, 1, stdout="", stderr="Error: unknown flag: --gitleaks-ignore-path")
+        Path(_value_after(cmd, "--report-path")).write_text("[]", encoding="utf-8")
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+    monkeypatch.setattr(external_tools.subprocess, "run", fake_run)
+    doc = run_scan(make_repo({"a.py": "x = 1\n"}), "--external", "gitleaks")
+    assert doc["tool_errors"] == [] and len(calls) == 3
+    assert calls[-1][1:3] == ["detect", "--no-git"]
+    assert _value_after(calls[-1], "--config") == str(SKILL / "assets" / "gitleaks.toml")
+
+
+def test_trivy_does_not_load_trivyignore(make_repo, monkeypatch):
+    monkeypatch.setattr(external_tools.shutil, "which", lambda name: "/usr/bin/" + name)
+    repo = make_repo({"a.py": "x = 1\n", ".trivyignore": "CVE-2099-0001\n"})
+    seen = {}
+
+    def fake_run(cmd, **kwargs):
+        ignore = Path(_value_after(cmd, "--ignorefile"))
+        seen.update(ignore=ignore, content=ignore.read_text(encoding="utf-8"))
+        return subprocess.CompletedProcess(cmd, 0, stdout='{"Results": []}', stderr="")
+    monkeypatch.setattr(external_tools.subprocess, "run", fake_run)
+    doc = run_scan(repo, "--external", "trivy")
+    assert doc["tool_errors"] == [] and seen["content"] == "" and not C.is_within(repo, seen["ignore"])
+
+
+@pytest.mark.parametrize("mode", ["full", "secrets", "dependencies"])
+def test_scanner_suppression_files_are_reported(make_repo, mode):
+    names = [".gitleaks.toml", ".gitleaksignore", ".semgrepignore", ".trivyignore"]
+    repo = make_repo({"a.py": "x = 1\n", **{n: "# suppress\n" for n in names}})
+    doc = run_scan(repo, "--mode", mode)
+    found = [f for f in doc["findings"] if f["rule_id"] == "meta.scanner-suppression-file"]
+    assert sorted(f["location"]["file"] for f in found) == sorted(names)
+    assert all(f["severity"] == "Informational" and f["status"] == "Needs Manual Review" for f in found)
+
+
+def test_no_suppression_finding_without_suppression_files(make_repo):
+    doc = run_scan(make_repo({"a.py": "x = 1\n", "docs/.semgrepignore.md": "text\n"}))
+    assert "meta.scanner-suppression-file" not in rule_ids(doc)

@@ -1,0 +1,8 @@
+# Gitleaks configuration owned by the secure-code-reviewer skill.
+# scripts/external_tools.py always passes this file with --config so that a .gitleaks.toml committed in the
+# audited repository (custom allowlists, disabled rules) cannot hide results. It only enables the upstream
+# default ruleset; do not add allowlists here - record triage decisions in a triage file instead.
+title = "secure-code-reviewer (gitleaks default rules, no repository allowlists)"
+
+[extend]
+useDefault = true

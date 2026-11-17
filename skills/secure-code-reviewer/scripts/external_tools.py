@@ -3,6 +3,17 @@
 Tools are used only if already installed and explicitly requested. Nothing is installed.
 Each adapter returns (raw_findings, error_or_None). A missing tool is *not* an error: it is
 reported as skipped coverage. Execution uses argument lists (no shell) and a timeout.
+
+The audited repository is untrusted: suppression mechanisms it ships must not hide results.
+- semgrep: `--disable-nosem` (inline `nosem` comments) and, when the installed version accepts it, the
+  experimental `--x-ignore-semgrepignore-files` (`.semgrepignore`).
+- gitleaks: `--config` with the skill's own `assets/gitleaks.toml` (the target's `.gitleaks.toml` is not
+  loaded), `--ignore-gitleaks-allow` (inline `gitleaks:allow`) and `--gitleaks-ignore-path` pointing to an
+  empty file (no `.gitleaksignore` from the working directory). Gitleaks 8.x still loads
+  `<target>/.gitleaksignore` unconditionally; scan_repository reports that file as
+  `meta.scanner-suppression-file` so the suppression is visible.
+- trivy: `--ignorefile` pointing to an empty file (no `.trivyignore` from the working directory).
+Remaining suppression files in the target are reported by scan_repository (`meta.scanner-suppression-file`).
 """
 from __future__ import annotations
 
@@ -17,6 +28,9 @@ from typing import Any, Dict, List, Optional, Tuple
 RawFinding = Dict[str, Any]
 SEMGREP_SEV = {"ERROR": "High", "WARNING": "Medium", "INFO": "Low"}
 TRIVY_SEV = {"CRITICAL": "Critical", "HIGH": "High", "MEDIUM": "Medium", "LOW": "Low", "UNKNOWN": "Medium"}
+GITLEAKS_CONFIG = Path(__file__).resolve().parent.parent / "assets" / "gitleaks.toml"
+SEMGREP_IGNORE_FILES_FLAG = "--x-ignore-semgrepignore-files"  # experimental flag; dropped if unsupported
+GITLEAKS_IGNORE_FLAGS = ("--ignore-gitleaks-allow", "--gitleaks-ignore-path")  # dropped if unsupported (old 8.x)
 
 
 def available(tool: str) -> bool:
@@ -45,9 +59,23 @@ def _rel(root: Path, path: str) -> str:
         return p.name
 
 
+def _unsupported_flag(err: Optional[str], flags: Tuple[str, ...]) -> bool:
+    low = (err or "").lower()
+    return any(f.lstrip("-") in low for f in flags) and any(
+        k in low for k in ("no such option", "unknown flag", "unknown option", "unrecognized", "unexpected argument"))
+
+
+def semgrep_cmd(root: Path, config: str, ignore_files_flag: bool = True) -> List[str]:
+    cmd = ["semgrep", "scan", "--json", "--metrics=off", "--quiet", "--disable-nosem", "--config", config]
+    if ignore_files_flag:
+        cmd.append(SEMGREP_IGNORE_FILES_FLAG)
+    return cmd + [str(root)]
+
+
 def run_semgrep(root: Path, config: str, timeout: int = 600) -> Tuple[List[RawFinding], Optional[str]]:
-    out, err = _run(["semgrep", "scan", "--json", "--metrics=off", "--quiet", "--config", config, str(root)],
-                    timeout, ok_codes=(0, 1))
+    out, err = _run(semgrep_cmd(root, config), timeout, ok_codes=(0, 1))
+    if _unsupported_flag(err, (SEMGREP_IGNORE_FILES_FLAG,)):
+        out, err = _run(semgrep_cmd(root, config, ignore_files_flag=False), timeout, ok_codes=(0, 1))
     if err:
         return [], err
     try:
@@ -87,14 +115,28 @@ def run_semgrep(root: Path, config: str, timeout: int = 600) -> Tuple[List[RawFi
     return results, None
 
 
+def gitleaks_cmd(root: Path, report: Path, empty_ignore: Path, legacy: bool = False,
+                 ignore_flags: bool = True) -> List[str]:
+    target = ["detect", "--no-git", "--source", str(root)] if legacy else ["dir", str(root)]
+    cmd = ["gitleaks", *target, "--config", str(GITLEAKS_CONFIG), "--report-format", "json",
+           "--report-path", str(report), "--redact", "--no-banner", "--exit-code", "0"]
+    if ignore_flags:
+        cmd += ["--ignore-gitleaks-allow", "--gitleaks-ignore-path", str(empty_ignore)]
+    return cmd
+
+
 def run_gitleaks(root: Path, timeout: int = 600) -> Tuple[List[RawFinding], Optional[str]]:
     with tempfile.TemporaryDirectory() as tmp:
         report = Path(tmp) / "gitleaks.json"
-        out, err = _run(["gitleaks", "dir", str(root), "--report-format", "json", "--report-path", str(report),
-                         "--redact", "--no-banner", "--exit-code", "0"], timeout)
+        empty_ignore = Path(tmp) / ".gitleaksignore"
+        empty_ignore.write_text("", encoding="utf-8")
+        legacy, ignore_flags = False, True
+        out, err = _run(gitleaks_cmd(root, report, empty_ignore), timeout)
         if err and "unknown command" in err.lower():
-            out, err = _run(["gitleaks", "detect", "--no-git", "--source", str(root), "--report-format", "json",
-                             "--report-path", str(report), "--redact", "--no-banner", "--exit-code", "0"], timeout)
+            legacy = True
+            out, err = _run(gitleaks_cmd(root, report, empty_ignore, legacy=True), timeout)
+        if _unsupported_flag(err, GITLEAKS_IGNORE_FLAGS):
+            out, err = _run(gitleaks_cmd(root, report, empty_ignore, legacy=legacy, ignore_flags=False), timeout)
         if err:
             return [], err
         try:
@@ -123,7 +165,11 @@ def run_gitleaks(root: Path, timeout: int = 600) -> Tuple[List[RawFinding], Opti
 
 
 def run_trivy(root: Path, timeout: int = 900) -> Tuple[List[RawFinding], Optional[str]]:
-    out, err = _run(["trivy", "fs", "--format", "json", "--quiet", "--scanners", "vuln,misconfig", str(root)], timeout)
+    with tempfile.TemporaryDirectory() as tmp:
+        empty_ignore = Path(tmp) / ".trivyignore"
+        empty_ignore.write_text("", encoding="utf-8")
+        out, err = _run(["trivy", "fs", "--format", "json", "--quiet", "--scanners", "vuln,misconfig",
+                         "--ignorefile", str(empty_ignore), str(root)], timeout)
     if err:
         return [], err
     try:

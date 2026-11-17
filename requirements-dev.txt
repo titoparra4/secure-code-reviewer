@@ -1,3 +1,7 @@
 # Test-only dependencies. The skill's scripts use the Python standard library only.
-pytest>=7.4
-jsonschema>=4.18
+# Exact pins (verified with the test suite). pytest 9 and jsonschema 4.26 require Python >= 3.10;
+# the Python 3.9 CI job uses the last releases that support it.
+pytest==9.2.0; python_version >= "3.10"
+pytest==8.4.2; python_version < "3.10"
+jsonschema==4.26.0; python_version >= "3.10"
+jsonschema==4.25.1; python_version < "3.10"
